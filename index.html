@@ -438,6 +438,36 @@
     <input type="text" id="input-gtoken" placeholder="ya29.xxxxx..." autocomplete="off" spellcheck="false">
     <button class="save-btn" onclick="saveSetting('gtoken')">保存</button>
 
+    <div class="setting-row" style="margin-top:12px;">
+      <div>
+        <div>リフレッシュトークン</div>
+        <div class="sub">自動更新用（推奨）</div>
+      </div>
+      <div class="setting-val unset" id="disp-refreshtoken">未設定</div>
+    </div>
+    <input type="text" id="input-refreshtoken" placeholder="1//04..." autocomplete="off" spellcheck="false">
+    <button class="save-btn" onclick="saveSetting('refreshtoken')">保存</button>
+
+    <div class="setting-row" style="margin-top:12px;">
+      <div>
+        <div>クライアントID</div>
+        <div class="sub">Google OAuth クライアントID</div>
+      </div>
+      <div class="setting-val unset" id="disp-clientid">未設定</div>
+    </div>
+    <input type="text" id="input-clientid" placeholder="889034426839-..." autocomplete="off" spellcheck="false">
+    <button class="save-btn" onclick="saveSetting('clientid')">保存</button>
+
+    <div class="setting-row" style="margin-top:12px;">
+      <div>
+        <div>クライアントシークレット</div>
+        <div class="sub">Google OAuth シークレット</div>
+      </div>
+      <div class="setting-val unset" id="disp-clientsecret">未設定</div>
+    </div>
+    <input type="text" id="input-clientsecret" placeholder="GOCSPX-..." autocomplete="off" spellcheck="false">
+    <button class="save-btn" onclick="saveSetting('clientsecret')">保存</button>
+
     <div style="margin-top:14px; padding:12px; background:var(--surface); border-radius:var(--radius-sm); font-size:12px; color:var(--text2); line-height:1.8;">
       <div style="color:var(--info); font-weight:500; margin-bottom:4px;">保存先フォルダ構成</div>
       トーエイ_資金繰り管理/2026年度/<br>
@@ -678,9 +708,33 @@ function showResult(r) {
   document.getElementById('btn-upload').style.display = 'block';
 }
 
+
+async function refreshAccessToken() {
+  const refreshToken = getSetting('refreshtoken');
+  const clientId = getSetting('clientid');
+  const clientSecret = getSetting('clientsecret');
+  if (!refreshToken || !clientId || !clientSecret) return null;
+  try {
+    const res = await fetch('https://toei-proxy.kuroda-toei.workers.dev/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}&client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}`
+    });
+    const data = await res.json();
+    if (data.access_token) {
+      localStorage.setItem('te_gtoken', data.access_token);
+      return data.access_token;
+    }
+  } catch(e) { console.error('Token refresh failed:', e); }
+  return null;
+}
+
 async function uploadToDrive() {
   if (!currentFile || !currentResult) return;
-  const gtoken = getSetting('gtoken');
+  let gtoken = getSetting('gtoken');
+  // Try to refresh token automatically
+  const newToken = await refreshAccessToken();
+  if (newToken) gtoken = newToken;
   const baseFolderId = getSetting('folderid') || '12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV';
   if (!gtoken) { alert('設定タブでGoogleアクセストークンを入力してください'); switchTab('settings'); return; }
 
