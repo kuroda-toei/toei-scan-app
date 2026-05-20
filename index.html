@@ -734,6 +734,7 @@ async function uploadToDrive() {
   let gtoken = getSetting('gtoken');
   // Try to refresh token automatically
   const newToken = await refreshAccessToken();
+  alert('refreshToken結果: ' + (newToken ? newToken.slice(0,20) : 'null'));
   if (newToken) gtoken = newToken;
   const baseFolderId = getSetting('folderid') || '12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV';
   if (!gtoken) { alert('設定タブでGoogleアクセストークンを入力してください'); switchTab('settings'); return; }
