@@ -5,337 +5,304 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>トーエイ 書類スキャン</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
-
-  :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: #2e2e2e;
-    --accent: #4ade80;
-    --accent-dim: #1a3d24;
-    --warn: #fb923c;
-    --warn-dim: #3d2010;
-    --info: #60a5fa;
-    --info-dim: #1a2d4d;
-    --err: #f87171;
-    --err-dim: #3d1a1a;
-    --text: #f0f0f0;
-    --text2: #888;
-    --text3: #555;
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    font-family: 'Noto Sans JP', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    max-width: 480px;
-    margin: 0 auto;
-    padding-bottom: 40px;
-  }
-
-  header {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .logo-mark {
-    width: 36px; height: 36px;
-    background: var(--accent);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 14px; font-weight: 500;
-    color: #000;
-    flex-shrink: 0;
-  }
-  header h1 { font-size: 17px; font-weight: 500; letter-spacing: .02em; }
-  header p { font-size: 11px; color: var(--text2); margin-top: 1px; font-family: 'DM Mono', monospace; }
-
-  .section { padding: 20px; }
-  .section + .section { border-top: 1px solid var(--border); }
-
-  .section-label {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    color: var(--text3);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-
-  /* Camera / Preview */
-  .camera-zone {
-    background: var(--surface);
-    border: 1.5px dashed var(--border);
-    border-radius: var(--radius);
-    min-height: 220px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: border-color .2s, background .2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .camera-zone:active { background: var(--surface2); border-color: var(--accent); }
-  .camera-zone svg { opacity: .35; }
-  .camera-zone p { font-size: 13px; color: var(--text2); }
-  .camera-zone small { font-size: 11px; color: var(--text3); }
-  #preview-img {
-    width: 100%; height: 100%;
-    object-fit: contain;
-    border-radius: var(--radius);
-    display: none;
-  }
-  .retake-btn {
-    position: absolute; top: 10px; right: 10px;
-    background: rgba(0,0,0,.7);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    color: var(--text);
-    font-size: 12px;
-    padding: 4px 12px;
-    cursor: pointer;
-    display: none;
-    font-family: 'Noto Sans JP', sans-serif;
-  }
-  input[type=file] { display: none; }
-
-  /* Analyse button */
-  .btn-analyse {
-    width: 100%;
-    margin-top: 14px;
-    padding: 14px;
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 15px;
-    font-weight: 700;
-    font-family: 'Noto Sans JP', sans-serif;
-    cursor: pointer;
-    transition: opacity .15s, transform .1s;
-    display: none;
-  }
-  .btn-analyse:active { transform: scale(.98); opacity: .85; }
-  .btn-analyse:disabled { opacity: .4; cursor: not-allowed; }
-
-  /* Result card */
-  .result-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    display: none;
-  }
-  .result-header {
-    padding: 14px 16px 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .category-badge {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-weight: 500;
-    letter-spacing: .04em;
-  }
-  .badge-uri    { background: var(--accent-dim);  color: var(--accent); }
-  .badge-shii   { background: var(--info-dim);    color: var(--info); }
-  .badge-keihi  { background: var(--warn-dim);    color: var(--warn); }
-  .badge-sonota { background: #2a2a1a;            color: #d4c06a; }
-  .badge-unknown { background: var(--err-dim);   color: var(--err); }
-
-  .result-body { padding: 14px 16px; }
-  .result-row {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-  .result-row:last-child { border-bottom: none; }
-  .result-row .label { color: var(--text2); font-size: 12px; flex-shrink: 0; margin-right: 8px; }
-  .result-row .val { font-weight: 500; text-align: right; }
-  .result-row .val.warn { color: var(--err); }
-
-  .folder-path {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    margin-top: 12px;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--text2);
-    line-height: 1.7;
-  }
-  .folder-path span { color: var(--accent); }
-
-  .confidence-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-top: 10px;
-    overflow: hidden;
-  }
-  .confidence-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: width .6s ease;
-  }
-  .confidence-label { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'DM Mono', monospace; }
-
-  /* Upload button */
-  .btn-upload {
-    width: 100%;
-    margin-top: 14px;
-    padding: 14px;
-    background: transparent;
-    color: var(--accent);
-    border: 1.5px solid var(--accent);
-    border-radius: var(--radius);
-    font-size: 15px;
-    font-weight: 700;
-    font-family: 'Noto Sans JP', sans-serif;
-    cursor: pointer;
-    transition: background .15s, transform .1s;
-    display: none;
-  }
-  .btn-upload:active { background: var(--accent-dim); transform: scale(.98); }
-  .btn-upload:disabled { opacity: .4; cursor: not-allowed; }
-
-  /* Status */
-  .status-bar {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    display: none;
-    align-items: center;
-    gap: 8px;
-  }
-  .status-bar.loading { background: var(--surface2); color: var(--text2); display: flex; }
-  .status-bar.success { background: var(--accent-dim); color: var(--accent); display: flex; }
-  .status-bar.error   { background: var(--err-dim);    color: var(--err);    display: flex; }
-
-  .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
-    flex-shrink: 0;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Settings */
-  .setting-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-  }
-  .setting-row:last-child { border-bottom: none; }
-  .setting-row .sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
-  .setting-val {
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-    color: var(--info);
-    text-align: right;
-    max-width: 180px;
-    word-break: break-all;
-  }
-  .setting-val.unset { color: var(--err); }
-
-  input[type=text] {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    font-size: 13px;
-    padding: 8px 12px;
-    width: 100%;
-    margin-top: 6px;
-    font-family: 'DM Mono', monospace;
-    outline: none;
-    transition: border-color .2s;
-  }
-  input[type=text]:focus { border-color: var(--accent); }
-
-  .save-btn {
-    margin-top: 8px;
-    padding: 9px 18px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    font-size: 13px;
-    font-family: 'Noto Sans JP', sans-serif;
-    cursor: pointer;
-    transition: border-color .15s;
-  }
-  .save-btn:active { border-color: var(--accent); color: var(--accent); }
-
-  /* History */
-  .history-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
-  .history-item:last-child { border-bottom: none; }
-  .history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .history-meta { flex: 1; min-width: 0; }
-  .history-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
-  .history-date { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 2px; }
-  .history-folder { font-size: 11px; color: var(--text2); flex-shrink: 0; }
-
-  .empty-history { font-size: 13px; color: var(--text3); text-align: center; padding: 20px 0; }
-
-  /* Tabs */
-  .tabs { display: flex; border-bottom: 1px solid var(--border); }
-  .tab {
-    flex: 1; padding: 14px; text-align: center; font-size: 13px;
-    color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent;
-    transition: color .2s, border-color .2s; user-select: none;
-  }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-
-  /* Claude API key warning */
-  .api-warn {
-    background: var(--warn-dim);
-    border: 1px solid var(--warn);
-    border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    font-size: 12px;
-    color: var(--warn);
-    line-height: 1.6;
-    margin-bottom: 14px;
-    display: none;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #242424;
+  --border: #2e2e2e;
+  --accent: #4ade80;
+  --accent-dim: #1a3d24;
+  --warn: #fb923c;
+  --warn-dim: #3d2010;
+  --info: #60a5fa;
+  --info-dim: #1a2d4d;
+  --err: #f87171;
+  --err-dim: #3d1a1a;
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #555;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-mark {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px; font-weight: 500;
+  color: #000;
+  flex-shrink: 0;
+}
+header h1 { font-size: 17px; font-weight: 500; letter-spacing: .02em; }
+header p { font-size: 11px; color: var(--text2); margin-top: 1px; font-family: 'DM Mono', monospace; }
+.section { padding: 20px; }
+.section + .section { border-top: 1px solid var(--border); }
+.section-label {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text3);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.camera-zone {
+  background: var(--surface);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  overflow: hidden;
+}
+.camera-zone:active { background: var(--surface2); border-color: var(--accent); }
+.camera-zone svg { opacity: .35; }
+.camera-zone p { font-size: 13px; color: var(--text2); }
+.camera-zone small { font-size: 11px; color: var(--text3); }
+#preview-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius);
+  display: none;
+}
+.retake-btn {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(0,0,0,.7);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 4px 12px;
+  cursor: pointer;
+  display: none;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+input[type=file] { display: none; }
+.btn-analyse {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  display: none;
+}
+.btn-analyse:active { transform: scale(.98); opacity: .85; }
+.btn-analyse:disabled { opacity: .4; cursor: not-allowed; }
+.result-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  display: none;
+}
+.result-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.category-badge {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+.badge-uri { background: var(--accent-dim); color: var(--accent); }
+.badge-shii { background: var(--info-dim); color: var(--info); }
+.badge-keihi { background: var(--warn-dim); color: var(--warn); }
+.badge-sonota { background: #2a2a1a; color: #d4c06a; }
+.badge-unknown { background: var(--err-dim); color: var(--err); }
+.result-body { padding: 14px 16px; }
+.result-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.result-row:last-child { border-bottom: none; }
+.result-row .label { color: var(--text2); font-size: 12px; flex-shrink: 0; margin-right: 8px; }
+.result-row .val { font-weight: 500; text-align: right; }
+.result-row .val.warn { color: var(--err); }
+.folder-path {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-top: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+.folder-path span { color: var(--accent); }
+.confidence-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+.confidence-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width .6s ease;
+}
+.confidence-label { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'DM Mono', monospace; }
+.btn-upload {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  display: none;
+}
+.btn-upload:active { background: var(--accent-dim); transform: scale(.98); }
+.btn-upload:disabled { opacity: .4; cursor: not-allowed; }
+.status-bar {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.status-bar.loading { background: var(--surface2); color: var(--text2); display: flex; }
+.status-bar.success { background: var(--accent-dim); color: var(--accent); display: flex; }
+.status-bar.error { background: var(--err-dim); color: var(--err); display: flex; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.setting-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-row .sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+.setting-val {
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  color: var(--info);
+  text-align: right;
+  max-width: 180px;
+  word-break: break-all;
+}
+.setting-val.unset { color: var(--err); }
+input[type=text] {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  padding: 8px 12px;
+  width: 100%;
+  margin-top: 6px;
+  font-family: 'DM Mono', monospace;
+  outline: none;
+  transition: border-color .2s;
+}
+input[type=text]:focus { border-color: var(--accent); }
+.save-btn {
+  margin-top: 8px;
+  padding: 9px 18px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.save-btn:active { border-color: var(--accent); color: var(--accent); }
+.history-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.history-item:last-child { border-bottom: none; }
+.history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.history-meta { flex: 1; min-width: 0; }
+.history-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.history-date { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.history-folder { font-size: 11px; color: var(--text2); flex-shrink: 0; }
+.empty-history { font-size: 13px; color: var(--text3); text-align: center; padding: 20px 0; }
+.tabs { display: flex; border-bottom: 1px solid var(--border); }
+.tab {
+  flex: 1; padding: 14px; text-align: center; font-size: 13px;
+  color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s; user-select: none;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.api-warn {
+  background: var(--warn-dim);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--warn);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  display: none;
+}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo-mark">TE</div>
   <div>
     <h1>トーエイ 書類スキャン</h1>
-    <p>株式会社トーエイ　資金繰り管理システム</p>
+    <p>株式会社トーエイ 資金繰り管理システム</p>
   </div>
 </header>
 
@@ -358,7 +325,7 @@
         <circle cx="12" cy="13" r="4"/>
       </svg>
       <p>タップして撮影</p>
-      <small>PDF・JPG対応　複数枚可</small>
+      <small>PDF・JPG対応 複数枚可</small>
       <img id="preview-img" alt="preview">
       <button class="retake-btn" id="retake-btn" onclick="retake(event)">撮り直す</button>
     </div>
@@ -409,64 +376,53 @@
         <div>APIキー</div>
         <div class="sub">claude.ai → Settings → API Keys</div>
       </div>
-      <div class="setting-val unset" id="disp-apikey">未設定</div>
+      <div class="setting-val" id="disp-apikey">設定済み</div>
     </div>
     <input type="text" id="input-apikey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
-    <button class="save-btn" onclick="saveSetting('apikey')">保存</button>
+    <button class="save-btn" onclick="saveSetting('apikey')">更新</button>
   </div>
 
   <div class="section">
     <div class="section-label">Googleドライブ設定</div>
-
     <div class="setting-row">
       <div>
         <div>ベースフォルダID</div>
         <div class="sub">2026年度フォルダのID</div>
       </div>
-      <div class="setting-val" id="disp-folderid">12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV</div>
+      <div class="setting-val" id="disp-folderid">設定済み</div>
     </div>
-    <input type="text" id="input-folderid" placeholder="GoogleドライブフォルダID" value="12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV">
-    <button class="save-btn" onclick="saveSetting('folderid')">保存</button>
-
-    <div class="setting-row" style="margin-top:12px;">
-      <div>
-        <div>アクセストークン</div>
-        <div class="sub">Google OAuth2 アクセストークン</div>
-      </div>
-      <div class="setting-val unset" id="disp-gtoken">未設定</div>
-    </div>
-    <input type="text" id="input-gtoken" placeholder="ya29.xxxxx..." autocomplete="off" spellcheck="false">
-    <button class="save-btn" onclick="saveSetting('gtoken')">保存</button>
+    <input type="text" id="input-folderid" placeholder="GoogleドライブフォルダID">
+    <button class="save-btn" onclick="saveSetting('folderid')">更新</button>
 
     <div class="setting-row" style="margin-top:12px;">
       <div>
         <div>リフレッシュトークン</div>
-        <div class="sub">自動更新用（推奨）</div>
+        <div class="sub">自動更新用</div>
       </div>
-      <div class="setting-val unset" id="disp-refreshtoken">未設定</div>
+      <div class="setting-val" id="disp-refreshtoken">設定済み</div>
     </div>
     <input type="text" id="input-refreshtoken" placeholder="1//04..." autocomplete="off" spellcheck="false">
-    <button class="save-btn" onclick="saveSetting('refreshtoken')">保存</button>
+    <button class="save-btn" onclick="saveSetting('refreshtoken')">更新</button>
 
     <div class="setting-row" style="margin-top:12px;">
       <div>
         <div>クライアントID</div>
         <div class="sub">Google OAuth クライアントID</div>
       </div>
-      <div class="setting-val unset" id="disp-clientid">未設定</div>
+      <div class="setting-val" id="disp-clientid">設定済み</div>
     </div>
     <input type="text" id="input-clientid" placeholder="889034426839-..." autocomplete="off" spellcheck="false">
-    <button class="save-btn" onclick="saveSetting('clientid')">保存</button>
+    <button class="save-btn" onclick="saveSetting('clientid')">更新</button>
 
     <div class="setting-row" style="margin-top:12px;">
       <div>
         <div>クライアントシークレット</div>
         <div class="sub">Google OAuth シークレット</div>
       </div>
-      <div class="setting-val unset" id="disp-clientsecret">未設定</div>
+      <div class="setting-val" id="disp-clientsecret">設定済み</div>
     </div>
     <input type="text" id="input-clientsecret" placeholder="GOCSPX-..." autocomplete="off" spellcheck="false">
-    <button class="save-btn" onclick="saveSetting('clientsecret')">保存</button>
+    <button class="save-btn" onclick="saveSetting('clientsecret')">更新</button>
 
     <div style="margin-top:14px; padding:12px; background:var(--surface); border-radius:var(--radius-sm); font-size:12px; color:var(--text2); line-height:1.8;">
       <div style="color:var(--info); font-weight:500; margin-bottom:4px;">保存先フォルダ構成</div>
@@ -478,20 +434,18 @@
       │&nbsp;&nbsp;&nbsp;└── <span style="color:#d4c06a;">その他/</span>
     </div>
   </div>
-
-  <div class="section">
-    <div class="section-label">設定手順</div>
-    <div style="font-size:12px; color:var(--text2); line-height:2;">
-      <div style="margin-bottom:8px;"><span style="color:var(--accent); font-family:'DM Mono',monospace;">01</span>&nbsp; Claude APIキーを取得: console.anthropic.com</div>
-      <div style="margin-bottom:8px;"><span style="color:var(--accent); font-family:'DM Mono',monospace;">02</span>&nbsp; Google Cloud Consoleでプロジェクト作成</div>
-      <div style="margin-bottom:8px;"><span style="color:var(--accent); font-family:'DM Mono',monospace;">03</span>&nbsp; Drive APIを有効化 → OAuth2認証を設定</div>
-      <div style="margin-bottom:8px;"><span style="color:var(--accent); font-family:'DM Mono',monospace;">04</span>&nbsp; アクセストークンを取得してここに入力</div>
-      <div><span style="color:var(--accent); font-family:'DM Mono',monospace;">05</span>&nbsp; 撮影して自動判別→保存を試す</div>
-    </div>
-  </div>
 </div>
 
 <script>
+// ===== 固定設定（ハードコード） =====
+const DEFAULTS = {
+  apikey:       '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',
+  folderid:     '12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV',
+  refreshtoken: '1//04_ypjecmlrlbCgYIARAASAQSNwF-L9IrRpbRVJbeelWfJuMwVrcAU6JPGQS5NOIVatGIRe5pfHDIzRpE5tnZa5yKfYPS6vUkAN8',
+  clientid:     '889034426839-pnpl505r3nrvo5hdnd9d4fntsnjdd630.apps.googleusercontent.com',
+  clientsecret: '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'
+};
+
 const FOLDER_LABELS = {
   uri:    { label: '売上',   cls: 'badge-uri',    color: '#4ade80', subdir: '売上' },
   shii:   { label: '仕入',   cls: 'badge-shii',   color: '#60a5fa', subdir: '仕入' },
@@ -503,9 +457,35 @@ let currentFile = null;
 let currentResult = null;
 let history = JSON.parse(localStorage.getItem('te_history') || '[]');
 
+// ===== 設定の読み書き =====
+function getSetting(key) {
+  return localStorage.getItem('te_' + key) || DEFAULTS[key] || '';
+}
+
+function saveSetting(key) {
+  const val = document.getElementById('input-' + key).value.trim();
+  if (!val) return;
+  localStorage.setItem('te_' + key, val);
+  const disp = document.getElementById('disp-' + key);
+  disp.textContent = (key === 'apikey' || key === 'gtoken') ? val.slice(0,12) + '...' : '更新済み';
+  disp.classList.remove('unset');
+  document.getElementById('input-' + key).value = '';
+  alert('保存しました');
+}
+
+function loadSettings() {
+  // DEFAULTSをlocalStorageに書き込み（上書きしない）
+  Object.entries(DEFAULTS).forEach(([k, v]) => {
+    if (!localStorage.getItem('te_' + k)) {
+      localStorage.setItem('te_' + k, v);
+    }
+  });
+}
+
+// ===== タブ切り替え =====
 function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const tabs = ['scan','history','settings'];
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabs = ['scan', 'history', 'settings'];
     t.classList.toggle('active', tabs[i] === tab);
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -513,31 +493,7 @@ function switchTab(tab) {
   if (tab === 'history') renderHistory();
 }
 
-function getSetting(key) { return localStorage.getItem('te_' + key) || ''; }
-function saveSetting(key) {
-  const val = document.getElementById('input-' + key).value.trim();
-  if (!val) return;
-  localStorage.setItem('te_' + key, val);
-  const disp = document.getElementById('disp-' + key);
-  disp.textContent = key === 'apikey' || key === 'gtoken' ? val.slice(0,12) + '...' : val;
-  disp.classList.remove('unset');
-  document.getElementById('input-' + key).value = '';
-  alert('保存しました');
-}
-
-function loadSettings() {
-  ['apikey','folderid','gtoken'].forEach(k => {
-    const v = getSetting(k);
-    if (v) {
-      const el = document.getElementById('disp-' + k);
-      el.textContent = k === 'apikey' || k === 'gtoken' ? v.slice(0,12) + '...' : v;
-      el.classList.remove('unset');
-    }
-  });
-  const fid = getSetting('folderid') || '12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV';
-  localStorage.setItem('te_folderid', fid);
-}
-
+// ===== カメラ =====
 function triggerCamera() {
   document.getElementById('file-input').click();
 }
@@ -559,7 +515,6 @@ function onFileSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
   currentFile = file;
-
   if (file.type.startsWith('image/')) {
     const reader = new FileReader();
     reader.onload = ev => {
@@ -578,18 +533,14 @@ function onFileSelected(e) {
   }
   document.getElementById('btn-analyse').style.display = 'block';
   document.getElementById('result-section').style.display = 'none';
-  checkApiWarn();
+  document.getElementById('api-warn').style.display = 'none';
 }
 
-function checkApiWarn() {
-  const warn = document.getElementById('api-warn');
-  warn.style.display = getSetting('apikey') ? 'none' : 'block';
-}
-
+// ===== AI判別 =====
 async function analyseDocument() {
   if (!currentFile) return;
   const apiKey = getSetting('apikey');
-  if (!apiKey) { alert('設定タブでClaude APIキーを入力してください'); switchTab('settings'); return; }
+  if (!apiKey) { alert('APIキーが設定されていません'); return; }
 
   document.getElementById('result-section').style.display = 'block';
   document.getElementById('result-card').style.display = 'none';
@@ -602,7 +553,6 @@ async function analyseDocument() {
     const mimeType = currentFile.type || 'image/jpeg';
 
     const prompt = `あなたは㈱トーエイ（群馬県桐生市・ダイカスト製造業）の経理書類を自動分類するAIです。
-
 添付の書類画像を分析し、以下のJSON形式のみで回答してください。説明文は一切不要です。
 
 {
@@ -657,7 +607,6 @@ amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部
     currentResult = JSON.parse(jsonStr);
     showResult(currentResult);
     hideStatus();
-
   } catch(e) {
     showStatus('error', 'エラー: ' + e.message);
   } finally {
@@ -671,8 +620,8 @@ function showResult(r) {
   badge.textContent = cat.label;
   badge.className = 'category-badge ' + cat.cls;
   document.getElementById('cat-label').textContent =
-    r.category === 'uri' ? '売上書類' :
-    r.category === 'shii' ? '仕入書類' :
+    r.category === 'uri'   ? '売上書類' :
+    r.category === 'shii'  ? '仕入書類' :
     r.category === 'keihi' ? '経費書類' : 'その他書類';
 
   document.getElementById('res-partner').textContent = r.partner || '不明';
@@ -690,17 +639,15 @@ function showResult(r) {
   document.getElementById('res-due').textContent = r.due_date || '要確認';
   document.getElementById('res-type').textContent = r.doc_type || '不明';
 
-  const today = new Date();
-  const ym = `${today.getFullYear()}年${String(today.getMonth()+1).padStart(2,'0')}月`;
   const folderPath = `PDF書類/${cat.subdir}/`;
   document.getElementById('folder-display').textContent = folderPath;
   document.getElementById('folder-path').style.display = 'block';
 
   const conf = Math.min(100, Math.max(0, r.confidence || 0));
   document.getElementById('conf-fill').style.width = conf + '%';
-  document.getElementById('conf-label').textContent = `判別精度: ${conf}%${r.notes ? '　★' + r.notes : ''}`;
+  document.getElementById('conf-label').textContent = `判別精度: ${conf}%${r.notes ? ' ★' + r.notes : ''}`;
   if (r.amount_flag) {
-    document.getElementById('conf-label').textContent += '　⚠ 大口・金額要確認';
+    document.getElementById('conf-label').textContent += ' ⚠ 大口・金額要確認';
     document.getElementById('conf-label').style.color = '#f87171';
   }
 
@@ -708,12 +655,17 @@ function showResult(r) {
   document.getElementById('btn-upload').style.display = 'block';
 }
 
-
+// ===== トークン更新 =====
 async function refreshAccessToken() {
   const refreshToken = getSetting('refreshtoken');
-  const clientId = getSetting('clientid');
+  const clientId     = getSetting('clientid');
   const clientSecret = getSetting('clientsecret');
-  if (!refreshToken || !clientId || !clientSecret) return null;
+
+  if (!refreshToken || !clientId || !clientSecret) {
+    console.error('リフレッシュトークン設定不足:', { refreshToken: !!refreshToken, clientId: !!clientId, clientSecret: !!clientSecret });
+    return null;
+  }
+
   try {
     const res = await fetch('https://toei-proxy.kuroda-toei.workers.dev/token', {
       method: 'POST',
@@ -724,23 +676,34 @@ async function refreshAccessToken() {
     if (data.access_token) {
       localStorage.setItem('te_gtoken', data.access_token);
       return data.access_token;
+    } else {
+      console.error('トークン更新失敗:', data);
     }
-  } catch(e) { console.error('Token refresh failed:', e); }
+  } catch(e) {
+    console.error('Token refresh failed:', e);
+  }
   return null;
 }
 
+// ===== Googleドライブ保存 =====
 async function uploadToDrive() {
   if (!currentFile || !currentResult) return;
-  let gtoken = getSetting('gtoken');
-  // Try to refresh token automatically
-  const newToken = await refreshAccessToken();
-  alert('refreshToken結果: ' + (newToken ? newToken.slice(0,20) : 'null'));
-  if (newToken) gtoken = newToken;
-  const baseFolderId = getSetting('folderid') || '12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV';
-  if (!gtoken) { alert('設定タブでGoogleアクセストークンを入力してください'); switchTab('settings'); return; }
 
-  showStatus('loading', 'Googleドライブに保存中...');
+  showStatus('loading', 'アクセストークンを更新中...');
   document.getElementById('btn-upload').disabled = true;
+
+  // リフレッシュトークンでアクセストークンを取得
+  const newToken = await refreshAccessToken();
+  let gtoken = newToken || getSetting('gtoken');
+
+  if (!gtoken) {
+    showStatus('error', 'アクセストークンの取得に失敗しました。設定を確認してください。');
+    document.getElementById('btn-upload').disabled = false;
+    return;
+  }
+
+  const baseFolderId = getSetting('folderid');
+  showStatus('loading', 'Googleドライブに保存中...');
 
   try {
     const cat = FOLDER_LABELS[currentResult.category] || FOLDER_LABELS['sonota'];
@@ -750,11 +713,9 @@ async function uploadToDrive() {
     const ext = currentFile.type === 'application/pdf' ? 'pdf' : 'jpg';
     const filename = `${cat.label}_${partner}_${ymd}.${ext}`;
 
-    // Find or create subfolder
     const subFolderId = await findOrCreateFolder(gtoken, baseFolderId, 'PDF書類');
     const catFolderId = await findOrCreateFolder(gtoken, subFolderId, cat.subdir);
 
-    // Upload file
     const formData = new FormData();
     const metadata = { name: filename, parents: [catFolderId] };
     formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
@@ -765,13 +726,14 @@ async function uploadToDrive() {
       headers: { 'Authorization': 'Bearer ' + gtoken },
       body: formData
     });
+
     if (!res.ok) {
       const e = await res.json();
       throw new Error(e.error?.message || 'Drive upload error');
     }
+
     const uploaded = await res.json();
 
-    // Save to history
     const entry = {
       id: uploaded.id,
       name: filename,
@@ -802,7 +764,6 @@ async function findOrCreateFolder(token, parentId, name) {
   });
   const data = await res.json();
   if (data.files && data.files.length > 0) return data.files[0].id;
-
   const create = await fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
@@ -848,8 +809,8 @@ function renderHistory() {
   `).join('');
 }
 
+// ===== 初期化 =====
 loadSettings();
-checkApiWarn();
 </script>
 </body>
 </html>
