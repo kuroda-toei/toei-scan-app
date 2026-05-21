@@ -393,7 +393,15 @@ input[type=text]:focus { border-color: var(--accent); }
     </div>
     <input type="text" id="input-folderid" placeholder="GoogleドライブフォルダID">
     <button class="save-btn" onclick="saveSetting('folderid')">更新</button>
-
+<div class="setting-row" style="margin-top:12px;">
+          <div>
+            <div>アクセストークン</div>
+            <div class="sub">Google OAuth2 アクセストークン</div>
+          </div>
+          <div class="setting-val unset" id="disp-gtoken">未設定</div>
+        </div>
+        <input type="text" id="input-gtoken" placeholder="ya29.xxxxx..." autocomplete="off" spellcheck="false">
+        <button class="save-btn" onclick="saveSetting('gtoken')">更新</button>
     <div class="setting-row" style="margin-top:12px;">
       <div>
         <div>リフレッシュトークン</div>
