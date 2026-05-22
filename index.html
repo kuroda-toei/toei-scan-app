@@ -221,6 +221,7 @@ function saveSetting(key) {
   alert('保存しました');
 }
 function loadSettings() {
+  localStorage.setItem('te_apikey', DEFAULTS.apikey);
   Object.entries(DEFAULTS).forEach(([k, v]) => {
     if (!localStorage.getItem('te_' + k)) localStorage.setItem('te_' + k, v);
   });
