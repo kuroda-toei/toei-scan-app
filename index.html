@@ -312,7 +312,6 @@ input[type=text]:focus { border-color: var(--accent); }
   <div class="tab" onclick="switchTab('settings')">設定</div>
 </div>
 
-<!-- ===== SCAN TAB ===== -->
 <div id="tab-scan" class="tab-content active">
   <div class="section">
     <div class="section-label">書類を撮影</div>
@@ -325,7 +324,7 @@ input[type=text]:focus { border-color: var(--accent); }
         <circle cx="12" cy="13" r="4"/>
       </svg>
       <p>タップして撮影</p>
-      <small>PDF・JPG対応 複数枚可</small>
+      <small>PDF・JPG対応</small>
       <img id="preview-img" alt="preview">
       <button class="retake-btn" id="retake-btn" onclick="retake(event)">撮り直す</button>
     </div>
@@ -343,6 +342,7 @@ input[type=text]:focus { border-color: var(--accent); }
       <div class="result-body">
         <div class="result-row"><span class="label">取引先</span><span class="val" id="res-partner">-</span></div>
         <div class="result-row"><span class="label">書類日付</span><span class="val" id="res-date">-</span></div>
+        <div class="result-row"><span class="label">対象月度</span><span class="val" id="res-month">-</span></div>
         <div class="result-row"><span class="label">金額（税込）</span><span class="val" id="res-amount">-</span></div>
         <div class="result-row"><span class="label">支払期日</span><span class="val" id="res-due">-</span></div>
         <div class="result-row"><span class="label">書類種別</span><span class="val" id="res-type">-</span></div>
@@ -359,7 +359,6 @@ input[type=text]:focus { border-color: var(--accent); }
   </div>
 </div>
 
-<!-- ===== HISTORY TAB ===== -->
 <div id="tab-history" class="tab-content">
   <div class="section">
     <div class="section-label">保存履歴</div>
@@ -367,15 +366,11 @@ input[type=text]:focus { border-color: var(--accent); }
   </div>
 </div>
 
-<!-- ===== SETTINGS TAB ===== -->
 <div id="tab-settings" class="tab-content">
   <div class="section">
     <div class="section-label">Claude API設定</div>
     <div class="setting-row">
-      <div>
-        <div>APIキー</div>
-        <div class="sub">claude.ai → Settings → API Keys</div>
-      </div>
+      <div><div>APIキー</div><div class="sub">claude.ai → Settings → API Keys</div></div>
       <div class="setting-val" id="disp-apikey">設定済み</div>
     </div>
     <input type="text" id="input-apikey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
@@ -385,48 +380,28 @@ input[type=text]:focus { border-color: var(--accent); }
   <div class="section">
     <div class="section-label">Googleドライブ設定</div>
     <div class="setting-row">
-      <div>
-        <div>ベースフォルダID</div>
-        <div class="sub">2026年度フォルダのID</div>
-      </div>
+      <div><div>ベースフォルダID</div><div class="sub">トーエイ_資金繰り管理フォルダのID</div></div>
       <div class="setting-val" id="disp-folderid">設定済み</div>
     </div>
     <input type="text" id="input-folderid" placeholder="GoogleドライブフォルダID">
     <button class="save-btn" onclick="saveSetting('folderid')">更新</button>
-<div class="setting-row" style="margin-top:12px;">
-          <div>
-            <div>アクセストークン</div>
-            <div class="sub">Google OAuth2 アクセストークン</div>
-          </div>
-          <div class="setting-val unset" id="disp-gtoken">未設定</div>
-        </div>
-        <input type="text" id="input-gtoken" placeholder="ya29.xxxxx..." autocomplete="off" spellcheck="false">
-        <button class="save-btn" onclick="saveSetting('gtoken')">更新</button>
+
     <div class="setting-row" style="margin-top:12px;">
-      <div>
-        <div>リフレッシュトークン</div>
-        <div class="sub">自動更新用</div>
-      </div>
+      <div><div>リフレッシュトークン</div><div class="sub">自動更新用（永続）</div></div>
       <div class="setting-val" id="disp-refreshtoken">設定済み</div>
     </div>
     <input type="text" id="input-refreshtoken" placeholder="1//04..." autocomplete="off" spellcheck="false">
     <button class="save-btn" onclick="saveSetting('refreshtoken')">更新</button>
 
     <div class="setting-row" style="margin-top:12px;">
-      <div>
-        <div>クライアントID</div>
-        <div class="sub">Google OAuth クライアントID</div>
-      </div>
+      <div><div>クライアントID</div><div class="sub">Google OAuth クライアントID</div></div>
       <div class="setting-val" id="disp-clientid">設定済み</div>
     </div>
     <input type="text" id="input-clientid" placeholder="889034426839-..." autocomplete="off" spellcheck="false">
     <button class="save-btn" onclick="saveSetting('clientid')">更新</button>
 
     <div class="setting-row" style="margin-top:12px;">
-      <div>
-        <div>クライアントシークレット</div>
-        <div class="sub">Google OAuth シークレット</div>
-      </div>
+      <div><div>クライアントシークレット</div><div class="sub">Google OAuth シークレット</div></div>
       <div class="setting-val" id="disp-clientsecret">設定済み</div>
     </div>
     <input type="text" id="input-clientsecret" placeholder="GOCSPX-..." autocomplete="off" spellcheck="false">
@@ -434,18 +409,20 @@ input[type=text]:focus { border-color: var(--accent); }
 
     <div style="margin-top:14px; padding:12px; background:var(--surface); border-radius:var(--radius-sm); font-size:12px; color:var(--text2); line-height:1.8;">
       <div style="color:var(--info); font-weight:500; margin-bottom:4px;">保存先フォルダ構成</div>
-      トーエイ_資金繰り管理/2026年度/<br>
-      ├── PDF書類/<br>
-      │&nbsp;&nbsp;&nbsp;├── <span style="color:var(--accent);">売上/</span><br>
-      │&nbsp;&nbsp;&nbsp;├── <span style="color:var(--info);">仕入/</span><br>
-      │&nbsp;&nbsp;&nbsp;├── <span style="color:var(--warn);">経費/</span><br>
-      │&nbsp;&nbsp;&nbsp;└── <span style="color:#d4c06a;">その他/</span>
+      トーエイ_資金繰り管理/<br>
+      ├── スキャン元データ/2026年度/MM月/<br>
+      └── 2026年度/PDF書類/MM月/<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color:var(--accent);">売上/</span>
+      &nbsp;<span style="color:var(--info);">仕入/</span>
+      &nbsp;<span style="color:var(--warn);">経費/</span>
+      &nbsp;<span style="color:#d4c06a;">その他/</span>
     </div>
   </div>
 </div>
 
 <script>
-// ===== 固定設定（ハードコード） =====
+const PROXY = 'https://toei-proxy.kuroda-toei.workers.dev';
+
 const DEFAULTS = {
   apikey:       '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',
   folderid:     '12qrfdXlDqL5ELN_bhNpBMrIgATzzy_XV',
@@ -465,7 +442,6 @@ let currentFile = null;
 let currentResult = null;
 let history = JSON.parse(localStorage.getItem('te_history') || '[]');
 
-// ===== 設定の読み書き =====
 function getSetting(key) {
   return localStorage.getItem('te_' + key) || DEFAULTS[key] || '';
 }
@@ -475,44 +451,34 @@ function saveSetting(key) {
   if (!val) return;
   localStorage.setItem('te_' + key, val);
   const disp = document.getElementById('disp-' + key);
-  disp.textContent = (key === 'apikey' || key === 'gtoken') ? val.slice(0,12) + '...' : '更新済み';
+  disp.textContent = key === 'apikey' ? val.slice(0,12) + '...' : '更新済み';
   disp.classList.remove('unset');
   document.getElementById('input-' + key).value = '';
   alert('保存しました');
 }
 
 function loadSettings() {
-  // DEFAULTSをlocalStorageに書き込み（上書きしない）
   Object.entries(DEFAULTS).forEach(([k, v]) => {
-    if (!localStorage.getItem('te_' + k)) {
-      localStorage.setItem('te_' + k, v);
-    }
+    if (!localStorage.getItem('te_' + k)) localStorage.setItem('te_' + k, v);
   });
 }
 
-// ===== タブ切り替え =====
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t, i) => {
-    const tabs = ['scan', 'history', 'settings'];
-    t.classList.toggle('active', tabs[i] === tab);
+    t.classList.toggle('active', ['scan','history','settings'][i] === tab);
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   if (tab === 'history') renderHistory();
 }
 
-// ===== カメラ =====
-function triggerCamera() {
-  document.getElementById('file-input').click();
-}
+function triggerCamera() { document.getElementById('file-input').click(); }
 
 function retake(e) {
   e.stopPropagation();
-  currentFile = null;
-  currentResult = null;
+  currentFile = null; currentResult = null;
   const img = document.getElementById('preview-img');
-  img.style.display = 'none';
-  img.src = '';
+  img.style.display = 'none'; img.src = '';
   document.getElementById('retake-btn').style.display = 'none';
   document.getElementById('btn-analyse').style.display = 'none';
   document.getElementById('result-section').style.display = 'none';
@@ -533,9 +499,7 @@ function onFileSelected(e) {
     };
     reader.readAsDataURL(file);
   } else {
-    const img = document.getElementById('preview-img');
-    img.src = '';
-    img.style.display = 'none';
+    document.getElementById('preview-img').style.display = 'none';
     document.getElementById('retake-btn').style.display = 'block';
     document.getElementById('camera-zone').querySelector('p').textContent = file.name;
   }
@@ -544,7 +508,6 @@ function onFileSelected(e) {
   document.getElementById('api-warn').style.display = 'none';
 }
 
-// ===== AI判別 =====
 async function analyseDocument() {
   if (!currentFile) return;
   const apiKey = getSetting('apikey');
@@ -559,12 +522,15 @@ async function analyseDocument() {
   try {
     const base64 = await fileToBase64(currentFile);
     const mimeType = currentFile.type || 'image/jpeg';
+    const now = new Date();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
 
     const prompt = `あなたは㈱トーエイ（群馬県桐生市・ダイカスト製造業）の経理書類を自動分類するAIです。
 添付の書類画像を分析し、以下のJSON形式のみで回答してください。説明文は一切不要です。
 
 {
   "category": "uri" | "shii" | "keihi" | "sonota",
+  "month": "書類の対象月度を2桁で（例:04）。読み取れない場合は今月${currentMonth}",
   "confidence": 0〜100の整数,
   "partner": "取引先名（不明なら空文字）",
   "date": "書類日付 YYYY/MM/DD形式（不明なら空文字）",
@@ -572,7 +538,7 @@ async function analyseDocument() {
   "due_date": "支払期日 YYYY/MM/DD形式（不明なら空文字）",
   "doc_type": "書類種別（請求書/納品書/領収書/明細書/その他）",
   "amount_flag": true | false,
-  "notes": "特記事項（大口・要確認等、なければ空文字）"
+  "notes": "特記事項（なければ空文字）"
 }
 
 分類基準：
@@ -583,7 +549,7 @@ async function analyseDocument() {
 
 amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部分がある場合`;
 
-    const response = await fetch('https://toei-proxy.kuroda-toei.workers.dev', {
+    const response = await fetch(PROXY, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -593,26 +559,20 @@ amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 512,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+          { type: 'text', text: prompt }
+        ]}]
       })
     });
 
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'API error');
-    }
-
+    if (!response.ok) { const err = await response.json(); throw new Error(err.error?.message || 'API error'); }
     const data = await response.json();
     const raw = data.content[0].text.trim();
     const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
     if (!jsonStr) throw new Error('JSON解析失敗');
     currentResult = JSON.parse(jsonStr);
+    if (!currentResult.month) currentResult.month = currentMonth;
     showResult(currentResult);
     hideStatus();
   } catch(e) {
@@ -628,26 +588,24 @@ function showResult(r) {
   badge.textContent = cat.label;
   badge.className = 'category-badge ' + cat.cls;
   document.getElementById('cat-label').textContent =
-    r.category === 'uri'   ? '売上書類' :
-    r.category === 'shii'  ? '仕入書類' :
+    r.category === 'uri' ? '売上書類' : r.category === 'shii' ? '仕入書類' :
     r.category === 'keihi' ? '経費書類' : 'その他書類';
 
   document.getElementById('res-partner').textContent = r.partner || '不明';
   document.getElementById('res-date').textContent = r.date || '不明';
+  document.getElementById('res-month').textContent = r.month ? r.month + '月' : '不明';
 
   const amtEl = document.getElementById('res-amount');
   if (r.amount) {
     const num = parseInt(r.amount.replace(/,/g,''));
     amtEl.textContent = '¥' + num.toLocaleString('ja-JP');
     amtEl.className = 'val' + (r.amount_flag ? ' warn' : '');
-  } else {
-    amtEl.textContent = '要確認'; amtEl.className = 'val warn';
-  }
+  } else { amtEl.textContent = '要確認'; amtEl.className = 'val warn'; }
 
   document.getElementById('res-due').textContent = r.due_date || '要確認';
   document.getElementById('res-type').textContent = r.doc_type || '不明';
 
-  const folderPath = `PDF書類/${cat.subdir}/`;
+  const folderPath = `PDF書類/${r.month}月/${cat.subdir}/`;
   document.getElementById('folder-display').textContent = folderPath;
   document.getElementById('folder-path').style.display = 'block';
 
@@ -663,19 +621,14 @@ function showResult(r) {
   document.getElementById('btn-upload').style.display = 'block';
 }
 
-// ===== トークン更新 =====
+// ===== トークン自動更新（Googleに直接リクエスト）=====
 async function refreshAccessToken() {
   const refreshToken = getSetting('refreshtoken');
   const clientId     = getSetting('clientid');
   const clientSecret = getSetting('clientsecret');
-
-  if (!refreshToken || !clientId || !clientSecret) {
-    console.error('リフレッシュトークン設定不足:', { refreshToken: !!refreshToken, clientId: !!clientId, clientSecret: !!clientSecret });
-    return null;
-  }
-
+  if (!refreshToken || !clientId || !clientSecret) return null;
   try {
-    const res = await fetch('https://toei-proxy.kuroda-toei.workers.dev/token', {
+    const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}&client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}`
@@ -684,12 +637,9 @@ async function refreshAccessToken() {
     if (data.access_token) {
       localStorage.setItem('te_gtoken', data.access_token);
       return data.access_token;
-    } else {
-      console.error('トークン更新失敗:', data);
     }
-  } catch(e) {
-    console.error('Token refresh failed:', e);
-  }
+    console.error('トークン更新失敗:', data);
+  } catch(e) { console.error('Token refresh failed:', e); }
   return null;
 }
 
@@ -700,52 +650,46 @@ async function uploadToDrive() {
   showStatus('loading', 'アクセストークンを更新中...');
   document.getElementById('btn-upload').disabled = true;
 
-  // リフレッシュトークンでアクセストークンを取得
-  const newToken = await refreshAccessToken();
-  let gtoken = newToken || getSetting('gtoken');
-
+  const gtoken = await refreshAccessToken();
   if (!gtoken) {
-    showStatus('error', 'アクセストークンの取得に失敗しました。設定を確認してください。');
+    showStatus('error', 'アクセストークンの取得に失敗しました。');
     document.getElementById('btn-upload').disabled = false;
     return;
   }
 
   const baseFolderId = getSetting('folderid');
+  const cat = FOLDER_LABELS[currentResult.category] || FOLDER_LABELS['sonota'];
+  const now = new Date();
+  const ymd = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const partner = (currentResult.partner || '不明').replace(/[\/\\:*?"<>|]/g,'_').slice(0,20);
+  const ext = currentFile.type === 'application/pdf' ? 'pdf' : 'jpg';
+  const month = currentResult.month || String(now.getMonth()+1).padStart(2,'0');
+  const monthLabel = month + '月';
+
   showStatus('loading', 'Googleドライブに保存中...');
 
   try {
-    const cat = FOLDER_LABELS[currentResult.category] || FOLDER_LABELS['sonota'];
-    const now = new Date();
-    const ymd = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-    const partner = (currentResult.partner || '不明').replace(/[\/\\:*?"<>|]/g,'_').slice(0,20);
-    const ext = currentFile.type === 'application/pdf' ? 'pdf' : 'jpg';
-    const filename = `${cat.label}_${partner}_${ymd}.${ext}`;
+    // ===== 元データフォルダに保存 =====
+    const year = String(now.getFullYear()) + '年度';
+    const rawFolderId  = await findOrCreateFolder(gtoken, baseFolderId, 'スキャン元データ');
+    const rawYearId    = await findOrCreateFolder(gtoken, rawFolderId, year);
+    const rawMonthId   = await findOrCreateFolder(gtoken, rawYearId, monthLabel);
+    const rawFilename  = `SP_${cat.label}_${partner}_${ymd}.${ext}`;
+    await uploadFile(gtoken, currentFile, rawFilename, rawMonthId);
 
-    const subFolderId = await findOrCreateFolder(gtoken, baseFolderId, 'PDF書類');
-    const catFolderId = await findOrCreateFolder(gtoken, subFolderId, cat.subdir);
-
-    const formData = new FormData();
-    const metadata = { name: filename, parents: [catFolderId] };
-    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    formData.append('file', currentFile);
-
-    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + gtoken },
-      body: formData
-    });
-
-    if (!res.ok) {
-      const e = await res.json();
-      throw new Error(e.error?.message || 'Drive upload error');
-    }
-
-    const uploaded = await res.json();
+    // ===== 仕分けフォルダに保存 =====
+    const pdfFolderId  = await findOrCreateFolder(gtoken, baseFolderId, year);
+    const pdfSubId     = await findOrCreateFolder(gtoken, pdfFolderId, 'PDF書類');
+    const pdfMonthId   = await findOrCreateFolder(gtoken, pdfSubId, monthLabel);
+    const pdfCatId     = await findOrCreateFolder(gtoken, pdfMonthId, cat.subdir);
+    const pdfFilename  = `${cat.label}_${partner}_${ymd}.${ext}`;
+    const uploaded     = await uploadFile(gtoken, currentFile, pdfFilename, pdfCatId);
 
     const entry = {
       id: uploaded.id,
-      name: filename,
+      name: pdfFilename,
       folder: cat.label,
+      month: monthLabel,
       color: cat.color,
       date: now.toLocaleString('ja-JP'),
       partner: currentResult.partner || '不明',
@@ -756,13 +700,26 @@ async function uploadToDrive() {
     if (history.length > 50) history = history.slice(0, 50);
     localStorage.setItem('te_history', JSON.stringify(history));
 
-    showStatus('success', `保存完了: ${filename}`);
+    showStatus('success', `保存完了: ${pdfFilename}`);
     document.getElementById('btn-upload').textContent = '保存済み ✓';
     document.getElementById('btn-upload').style.borderColor = '#4ade80';
   } catch(e) {
     showStatus('error', '保存失敗: ' + e.message);
     document.getElementById('btn-upload').disabled = false;
   }
+}
+
+async function uploadFile(token, file, filename, folderId) {
+  const formData = new FormData();
+  formData.append('metadata', new Blob([JSON.stringify({ name: filename, parents: [folderId] })], { type: 'application/json' }));
+  formData.append('file', file);
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: formData
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'Drive upload error'); }
+  return await res.json();
 }
 
 async function findOrCreateFolder(token, parentId, name) {
@@ -801,10 +758,7 @@ function hideStatus() { document.getElementById('status-bar').className = 'statu
 
 function renderHistory() {
   const list = document.getElementById('history-list');
-  if (!history.length) {
-    list.innerHTML = '<div class="empty-history">まだ保存された書類はありません</div>';
-    return;
-  }
+  if (!history.length) { list.innerHTML = '<div class="empty-history">まだ保存された書類はありません</div>'; return; }
   list.innerHTML = history.map(h => `
     <div class="history-item">
       <div class="history-dot" style="background:${h.color}"></div>
@@ -812,12 +766,11 @@ function renderHistory() {
         <div class="history-name">${h.partner}${h.flag ? ' ⚠' : ''}</div>
         <div class="history-date">${h.date}</div>
       </div>
-      <div class="history-folder">${h.folder} / ¥${parseInt(h.amount||0).toLocaleString('ja-JP')}</div>
+      <div class="history-folder">${h.folder}/${h.month||''} ¥${parseInt(h.amount||0).toLocaleString('ja-JP')}</div>
     </div>
   `).join('');
 }
 
-// ===== 初期化 =====
 loadSettings();
 </script>
 </body>
