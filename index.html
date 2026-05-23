@@ -40,11 +40,14 @@ input[type=file] { display: none; }
 .badge-keihi { background: var(--warn-dim); color: var(--warn); }
 .badge-sonota { background: #2a2a1a; color: #d4c06a; }
 .result-body { padding: 14px 16px; }
-.result-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.result-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .result-row:last-child { border-bottom: none; }
 .result-row .label { color: var(--text2); font-size: 12px; flex-shrink: 0; margin-right: 8px; }
 .result-row .val { font-weight: 500; text-align: right; }
 .result-row .val.warn { color: var(--err); }
+.edit-select { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; outline: none; }
+.edit-input { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 13px; text-align: right; width: 58%; font-family: 'DM Mono', monospace; outline: none; }
+.edit-select:focus, .edit-input:focus { border-color: var(--accent); }
 .folder-path { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 12px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); line-height: 1.7; }
 .folder-path span { color: var(--accent); }
 .confidence-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
@@ -82,6 +85,7 @@ input[type=text]:focus { border-color: var(--accent); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 .api-warn { background: var(--warn-dim); border: 1px solid var(--warn); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--warn); line-height: 1.6; margin-bottom: 14px; display: none; }
+.edit-hint { font-size: 10px; color: var(--text3); text-align: right; margin-top: 4px; font-family: 'DM Mono', monospace; }
 </style>
 </head>
 <body>
@@ -115,19 +119,57 @@ input[type=text]:focus { border-color: var(--accent); }
     <button class="btn-analyse" id="btn-analyse" onclick="analyseDocument()">AIで自動判別する</button>
   </div>
   <div class="section" id="result-section" style="display:none;">
-    <div class="section-label">判別結果</div>
+    <div class="section-label">判別結果 <span style="color:var(--text3);font-size:9px;">※各項目を修正できます</span></div>
     <div class="result-card" id="result-card">
       <div class="result-header">
         <span class="category-badge" id="cat-badge">-</span>
         <span style="font-size:13px;font-weight:500;" id="cat-label">判別中...</span>
       </div>
       <div class="result-body">
-        <div class="result-row"><span class="label">取引先</span><span class="val" id="res-partner">-</span></div>
-        <div class="result-row"><span class="label">書類日付</span><span class="val" id="res-date">-</span></div>
-        <div class="result-row"><span class="label">対象月度</span><span class="val" id="res-month">-</span></div>
-        <div class="result-row"><span class="label">金額（税込）</span><span class="val" id="res-amount">-</span></div>
-        <div class="result-row"><span class="label">支払期日</span><span class="val" id="res-due">-</span></div>
-        <div class="result-row"><span class="label">書類種別</span><span class="val" id="res-type">-</span></div>
+        <div class="result-row">
+          <span class="label">カテゴリ</span>
+          <select class="edit-select" id="edit-category" onchange="onCategoryChange()">
+            <option value="uri">売上</option>
+            <option value="shii">仕入</option>
+            <option value="keihi">経費</option>
+            <option value="sonota">その他</option>
+          </select>
+        </div>
+        <div class="result-row">
+          <span class="label">取引先</span>
+          <input class="edit-input" type="text" id="edit-partner" placeholder="取引先名">
+        </div>
+        <div class="result-row">
+          <span class="label">書類日付</span>
+          <span class="val" id="res-date">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label">対象月度</span>
+          <select class="edit-select" id="edit-month">
+            <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+            <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+            <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+            <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+          </select>
+        </div>
+        <div class="result-row">
+          <span class="label">金額（税込）</span>
+          <input class="edit-input" type="text" id="edit-amount" placeholder="数字のみ">
+        </div>
+        <div class="result-row">
+          <span class="label">支払期日</span>
+          <span class="val" id="res-due">-</span>
+        </div>
+        <div class="result-row">
+          <span class="label">書類種別</span>
+          <select class="edit-select" id="edit-type">
+            <option value="請求書">請求書</option>
+            <option value="明細書">明細書</option>
+            <option value="納品書">納品書</option>
+            <option value="領収書">領収書</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
         <div class="folder-path" id="folder-path">保存先: <span id="folder-display">-</span></div>
         <div class="confidence-bar"><div class="confidence-fill" id="conf-fill" style="width:0%"></div></div>
         <div class="confidence-label" id="conf-label">判別精度: -</div>
@@ -209,7 +251,11 @@ const FOLDER_LABELS = {
 let currentFile = null;
 let currentResult = null;
 let history = JSON.parse(localStorage.getItem('te_history') || '[]');
-function getSetting(key) {   if (key === 'apikey') return DEFAULTS.apikey;   return localStorage.getItem('te_' + key) || DEFAULTS[key] || ''; }
+
+function getSetting(key) {
+  if (key === 'apikey') return DEFAULTS.apikey;
+  return localStorage.getItem('te_' + key) || DEFAULTS[key] || '';
+}
 function saveSetting(key) {
   const val = document.getElementById('input-' + key).value.trim();
   if (!val) return;
@@ -236,7 +282,7 @@ function switchTab(tab) {
 }
 function triggerCamera() { document.getElementById('file-input').click(); }
 function retake(e) {
- e.stopPropagation();
+  e.stopPropagation();
   currentFile = null; currentResult = null;
   const img = document.getElementById('preview-img');
   img.style.display = 'none'; img.src = '';
@@ -270,6 +316,19 @@ function onFileSelected(e) {
   document.getElementById('result-section').style.display = 'none';
   document.getElementById('api-warn').style.display = 'none';
 }
+
+function onCategoryChange() {
+  const cat = FOLDER_LABELS[document.getElementById('edit-category').value] || FOLDER_LABELS['sonota'];
+  const badge = document.getElementById('cat-badge');
+  badge.textContent = cat.label;
+  badge.className = 'category-badge ' + cat.cls;
+  document.getElementById('cat-label').textContent =
+    cat.label === '売上' ? '売上書類' : cat.label === '仕入' ? '仕入書類' :
+    cat.label === '経費' ? '経費書類' : 'その他書類';
+  const month = document.getElementById('edit-month').value;
+  document.getElementById('folder-display').textContent = `PDF書類/${month}月/${cat.subdir}/`;
+}
+
 async function analyseDocument() {
   if (!currentFile) return;
   const apiKey = getSetting('apikey');
@@ -333,6 +392,7 @@ amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部
     document.getElementById('btn-analyse').disabled = false;
   }
 }
+
 function showResult(r) {
   const cat = FOLDER_LABELS[r.category] || FOLDER_LABELS['sonota'];
   const badge = document.getElementById('cat-badge');
@@ -341,20 +401,20 @@ function showResult(r) {
   document.getElementById('cat-label').textContent =
     r.category === 'uri' ? '売上書類' : r.category === 'shii' ? '仕入書類' :
     r.category === 'keihi' ? '経費書類' : 'その他書類';
-  document.getElementById('res-partner').textContent = r.partner || '不明';
+
+  // 編集フィールドに値をセット
+  document.getElementById('edit-category').value = r.category || 'sonota';
+  document.getElementById('edit-partner').value = r.partner || '';
+  document.getElementById('edit-month').value = r.month || '01';
+  document.getElementById('edit-amount').value = r.amount || '';
+  document.getElementById('edit-type').value = r.doc_type || '請求書';
   document.getElementById('res-date').textContent = r.date || '不明';
-  document.getElementById('res-month').textContent = r.month ? r.month + '月' : '不明';
-  const amtEl = document.getElementById('res-amount');
-  if (r.amount) {
-    const num = parseInt(r.amount.replace(/,/g,''));
-    amtEl.textContent = '¥' + num.toLocaleString('ja-JP');
-    amtEl.className = 'val' + (r.amount_flag ? ' warn' : '');
-  } else { amtEl.textContent = '要確認'; amtEl.className = 'val warn'; }
   document.getElementById('res-due').textContent = r.due_date || '要確認';
-  document.getElementById('res-type').textContent = r.doc_type || '不明';
+
   const folderPath = `PDF書類/${r.month}月/${cat.subdir}/`;
   document.getElementById('folder-display').textContent = folderPath;
   document.getElementById('folder-path').style.display = 'block';
+
   const conf = Math.min(100, Math.max(0, r.confidence || 0));
   document.getElementById('conf-fill').style.width = conf + '%';
   document.getElementById('conf-label').textContent = `判別精度: ${conf}%${r.notes ? ' ★' + r.notes : ''}`;
@@ -365,6 +425,7 @@ function showResult(r) {
   document.getElementById('result-card').style.display = 'block';
   document.getElementById('btn-upload').style.display = 'block';
 }
+
 async function refreshAccessToken() {
   const refreshToken = getSetting('refreshtoken');
   const clientId     = getSetting('clientid');
@@ -390,8 +451,17 @@ async function refreshAccessToken() {
   } catch(e) { console.error('Token refresh failed:', e); }
   return null;
 }
+
 async function uploadToDrive() {
   if (!currentFile || !currentResult) return;
+
+  // 編集された値でcurrentResultを上書き
+  currentResult.category = document.getElementById('edit-category').value;
+  currentResult.partner  = document.getElementById('edit-partner').value.trim() || '不明';
+  currentResult.month    = document.getElementById('edit-month').value;
+  currentResult.amount   = document.getElementById('edit-amount').value.replace(/[^0-9]/g, '');
+  currentResult.doc_type = document.getElementById('edit-type').value;
+
   showStatus('loading', 'アクセストークンを更新中...');
   document.getElementById('btn-upload').disabled = true;
   const gtoken = await refreshAccessToken();
@@ -404,7 +474,7 @@ async function uploadToDrive() {
   const cat = FOLDER_LABELS[currentResult.category] || FOLDER_LABELS['sonota'];
   const now = new Date();
   const ymd = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-  const partner = (currentResult.partner || '不明').replace(/[\/\\:*?"<>|]/g,'_').slice(0,20);
+  const partner = currentResult.partner.replace(/[\/\\:*?"<>|]/g,'_').slice(0,20);
   const ext = currentFile.type === 'application/pdf' ? 'pdf' : 'jpg';
   const month = currentResult.month || String(now.getMonth()+1).padStart(2,'0');
   const monthLabel = month + '月';
@@ -424,7 +494,7 @@ async function uploadToDrive() {
     const entry = {
       id: uploaded.id, name: pdfFilename, folder: cat.label, month: monthLabel,
       color: cat.color, date: now.toLocaleString('ja-JP'),
-      partner: currentResult.partner || '不明', amount: currentResult.amount || '不明',
+      partner: currentResult.partner, amount: currentResult.amount || '不明',
       flag: currentResult.amount_flag,
     };
     history.unshift(entry);
@@ -438,6 +508,7 @@ async function uploadToDrive() {
     document.getElementById('btn-upload').disabled = false;
   }
 }
+
 async function uploadFile(token, file, filename, folderId) {
   const formData = new FormData();
   formData.append('metadata', new Blob([JSON.stringify({ name: filename, parents: [folderId] })], { type: 'application/json' }));
@@ -448,6 +519,7 @@ async function uploadFile(token, file, filename, folderId) {
   if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'Drive upload error'); }
   return await res.json();
 }
+
 async function findOrCreateFolder(token, parentId, name) {
   const q = encodeURIComponent(`name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
   const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
@@ -463,6 +535,7 @@ async function findOrCreateFolder(token, parentId, name) {
   const folder = await create.json();
   return folder.id;
 }
+
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -506,6 +579,7 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
 function getExifOrientation(file) {
   return new Promise(resolve => {
     const reader = new FileReader();
@@ -534,6 +608,7 @@ function getExifOrientation(file) {
     reader.readAsArrayBuffer(file.slice(0, 64 * 1024));
   });
 }
+
 function showStatus(type, msg) {
   const bar = document.getElementById('status-bar');
   bar.className = 'status-bar ' + type;
