@@ -486,7 +486,7 @@ function fileToBase64(file) {
             case 8: ctx.transform(0,-1,1,0,0,w); break;
           }
           ctx.drawImage(img, 0, 0);
-          resolve(canvas.toDataURL('image/jpeg', 0.9).split(',')[1]);
+          r// 最大幅1600pxにリサイズして圧縮 const maxSize = 1600; let sw = canvas.width, sh = canvas.height; if (sw > maxSize || sh > maxSize) {   const ratio = Math.min(maxSize/sw, maxSize/sh);   const resized = document.createElement('canvas');   resized.width = Math.round(sw * ratio);   resized.height = Math.round(sh * ratio);   resized.getContext('2d').drawImage(canvas, 0, 0, resized.width, resized.height);   resolve(resized.toDataURL('image/jpeg', 0.85).split(',')[1]); } else {   resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]); }
         });
       };
       img.onerror = reject;
