@@ -18,7 +18,7 @@ header { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); displa
 .logo-mark { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: #000; flex-shrink: 0; }
 header h1 { font-size: 17px; font-weight: 500; letter-spacing: .02em; }
 header p { font-size: 11px; color: var(--text2); margin-top: 1px; font-family: 'DM Mono', monospace; }
-.mode-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; font-weight: 500; margin-left: 8px; }
+.mode-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-family: 'DM Mono', monospace; font-weight: 500; }
 .mode-badge.auto { background: var(--warn-dim); color: var(--warn); }
 .mode-badge.confirm { background: var(--accent-dim); color: var(--accent); }
 .section { padding: 20px; }
@@ -35,6 +35,7 @@ input[type=file] { display: none; }
 .btn-analyse { width: 100%; margin-top: 14px; padding: 14px; background: var(--accent); color: #000; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: opacity .15s, transform .1s; display: none; }
 .btn-analyse:active { transform: scale(.98); opacity: .85; }
 .btn-analyse:disabled { opacity: .4; cursor: not-allowed; }
+.btn-analyse.auto-mode { background: var(--warn); }
 .result-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; display: none; }
 .result-header { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
 .category-badge { font-size: 11px; font-family: 'DM Mono', monospace; padding: 3px 10px; border-radius: 20px; font-weight: 500; letter-spacing: .04em; }
@@ -71,13 +72,11 @@ input[type=text] { background: var(--surface2); border: 1px solid var(--border);
 input[type=text]:focus { border-color: var(--accent); }
 .save-btn { margin-top: 8px; padding: 9px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-size: 13px; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: border-color .15s; }
 .save-btn:active { border-color: var(--accent); color: var(--accent); }
-/* モード切替スイッチ */
 .mode-switch-wrap { display: flex; background: var(--surface2); border-radius: 10px; padding: 4px; gap: 4px; margin-top: 8px; }
 .mode-switch-btn { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; border: none; background: transparent; color: var(--text2); transition: all .2s; }
 .mode-switch-btn.active-confirm { background: var(--accent-dim); color: var(--accent); font-weight: 700; }
 .mode-switch-btn.active-auto { background: var(--warn-dim); color: var(--warn); font-weight: 700; }
 .mode-desc { font-size: 11px; color: var(--text3); margin-top: 6px; line-height: 1.6; font-family: 'DM Mono', monospace; }
-/* 履歴 */
 .history-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .history-item:last-child { border-bottom: none; }
 .history-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
@@ -94,19 +93,23 @@ input[type=text]:focus { border-color: var(--accent); }
 .btn-reflect { width: 100%; padding: 14px; background: var(--info-dim); color: var(--info); border: 1.5px solid var(--info); border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: background .15s; margin-bottom: 14px; }
 .btn-reflect:disabled { opacity: .4; cursor: not-allowed; }
 .reflect-count { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 8px; font-family: 'DM Mono', monospace; }
-/* 自動保存完了画面 */
-.auto-result { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: var(--radius); padding: 20px; text-align: center; display: none; margin-top: 14px; }
-.auto-result .check { font-size: 36px; margin-bottom: 8px; }
-.auto-result .auto-filename { font-size: 12px; color: var(--accent); font-family: 'DM Mono', monospace; margin-top: 6px; word-break: break-all; }
-.btn-next { width: 100%; margin-top: 14px; padding: 14px; background: var(--accent); color: #000; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; display: none; }
+/* 自動保存完了 */
+.auto-complete { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-top: 14px; }
+.auto-complete .check { font-size: 40px; margin-bottom: 10px; }
+.auto-complete .title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+.auto-complete .filename { font-size: 11px; color: var(--accent); font-family: 'DM Mono', monospace; word-break: break-all; }
+.btn-next { width: 100%; margin-top: 14px; padding: 14px; background: var(--warn); color: #000; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; }
 </style>
 </head>
 <body>
 <header>
   <div class="logo-mark">TE</div>
-  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
-    <h1>トーエイ 書類スキャン</h1>
-    <span class="mode-badge confirm" id="header-mode-badge">確認モード</span>
+  <div>
+    <h1 style="display:flex;align-items:center;gap:8px;">
+      トーエイ 書類スキャン
+      <span class="mode-badge confirm" id="header-mode-badge">確認モード</span>
+    </h1>
+    <p>株式会社トーエイ 資金繰り管理システム</p>
   </div>
 </header>
 <div class="tabs">
@@ -131,6 +134,14 @@ input[type=text]:focus { border-color: var(--accent); }
     </div>
     <input type="file" id="file-input" accept="image/*,application/pdf" capture="environment" onchange="onFileSelected(event)">
     <button class="btn-analyse" id="btn-analyse" onclick="analyseDocument()">AIで自動判別する</button>
+  </div>
+
+  <!-- ステータスバー（スキャンエリア直下・全モード共通） -->
+  <div class="section" id="status-section" style="display:none;padding-top:0;">
+    <div class="status-bar" id="status-bar" style="margin-top:0;">
+      <div class="spinner" id="spinner"></div>
+      <span id="status-text">処理中...</span>
+    </div>
   </div>
 
   <!-- 確認モード：判別結果＋編集 -->
@@ -191,21 +202,17 @@ input[type=text]:focus { border-color: var(--accent); }
         <div class="confidence-label" id="conf-label">判別精度: -</div>
       </div>
     </div>
-    <div class="status-bar" id="status-bar">
-      <div class="spinner" id="spinner"></div>
-      <span id="status-text">処理中...</span>
-    </div>
     <button class="btn-upload" id="btn-upload" onclick="uploadToDrive()">Googleドライブに保存する</button>
   </div>
 
   <!-- 自動モード：保存完了表示 -->
-  <div class="section" id="auto-result-section" style="display:none;">
-    <div class="auto-result" id="auto-result">
+  <div class="section" id="auto-complete-section" style="display:none;">
+    <div class="auto-complete">
       <div class="check">✅</div>
-      <div style="font-size:15px;font-weight:700;color:var(--accent);">自動保存完了</div>
-      <div class="auto-filename" id="auto-filename"></div>
+      <div class="title">自動保存完了！</div>
+      <div class="filename" id="auto-filename"></div>
     </div>
-    <button class="btn-next" id="btn-next" onclick="nextScan()">次の書類を撮影する</button>
+    <button class="btn-next" onclick="resetScanUI()">次の書類を撮影する →</button>
   </div>
 </div>
 
@@ -214,9 +221,7 @@ input[type=text]:focus { border-color: var(--accent); }
   <div class="section">
     <div class="section-label">反映待ち一覧</div>
     <div class="reflect-count" id="reflect-count">読み込み中...</div>
-    <button class="btn-reflect" id="btn-reflect" onclick="reflectToSheet()" disabled>
-      資金繰り表に反映する（未実装）
-    </button>
+    <button class="btn-reflect" id="btn-reflect" onclick="reflectToSheet()" disabled>資金繰り表に反映する（未実装）</button>
     <div id="history-list"><div class="empty-history">読み込み中...</div></div>
   </div>
 </div>
@@ -228,7 +233,7 @@ input[type=text]:focus { border-color: var(--accent); }
     <div class="setting-row">
       <div>
         <div>撮影モード切替</div>
-        <div class="sub">確認モード：判別後に修正可能 / 自動モード：即保存</div>
+        <div class="sub">確認：修正してから保存 / 自動：即保存・連続撮影向け</div>
       </div>
     </div>
     <div class="mode-switch-wrap">
@@ -240,7 +245,7 @@ input[type=text]:focus { border-color: var(--accent); }
   <div class="section">
     <div class="section-label">Claude API設定</div>
     <div class="setting-row">
-      <div><div>APIキー</div><div class="sub">claude.ai → Settings → API Keys</div></div>
+      <div><div>APIキー</div><div class="sub">Cloudflare Worker管理</div></div>
       <div class="setting-val" id="disp-apikey">設定済み</div>
     </div>
     <input type="text" id="input-apikey" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
@@ -261,13 +266,13 @@ input[type=text]:focus { border-color: var(--accent); }
     <input type="text" id="input-refreshtoken" placeholder="1//04..." autocomplete="off" spellcheck="false">
     <button class="save-btn" onclick="saveSetting('refreshtoken')">更新</button>
     <div class="setting-row" style="margin-top:12px;">
-      <div><div>クライアントID</div><div class="sub">Google OAuth クライアントID</div></div>
+      <div><div>クライアントID</div></div>
       <div class="setting-val" id="disp-clientid">設定済み</div>
     </div>
     <input type="text" id="input-clientid" placeholder="889034426839-..." autocomplete="off" spellcheck="false">
     <button class="save-btn" onclick="saveSetting('clientid')">更新</button>
     <div class="setting-row" style="margin-top:12px;">
-      <div><div>クライアントシークレット</div><div class="sub">Google OAuth シークレット</div></div>
+      <div><div>クライアントシークレット</div></div>
       <div class="setting-val" id="disp-clientsecret">設定済み</div>
     </div>
     <input type="text" id="input-clientsecret" placeholder="GOCSPX-..." autocomplete="off" spellcheck="false">
@@ -301,9 +306,7 @@ let currentFile = null;
 let currentResult = null;
 
 // ===== モード管理 =====
-function getMode() {
-  return localStorage.getItem('te_mode') || 'confirm';
-}
+function getMode() { return localStorage.getItem('te_mode') || 'confirm'; }
 function setMode(mode) {
   localStorage.setItem('te_mode', mode);
   updateModeUI();
@@ -314,18 +317,27 @@ function updateModeUI() {
   const btnConfirm = document.getElementById('btn-mode-confirm');
   const btnAuto = document.getElementById('btn-mode-auto');
   const desc = document.getElementById('mode-desc');
+  const btnAnalyse = document.getElementById('btn-analyse');
   if (mode === 'auto') {
     badge.textContent = '自動モード';
     badge.className = 'mode-badge auto';
     btnConfirm.className = 'mode-switch-btn';
     btnAuto.className = 'mode-switch-btn active-auto';
-    desc.textContent = '⚡ 自動モード：判別後すぐ保存。連続撮影に最適。修正はできません。';
+    desc.textContent = '⚡ 自動モード：判別後すぐ自動保存。連続撮影に最適。';
+    if (btnAnalyse.style.display !== 'none') {
+      btnAnalyse.textContent = 'AIで自動判別・保存する';
+      btnAnalyse.className = 'btn-analyse auto-mode';
+    }
   } else {
     badge.textContent = '確認モード';
     badge.className = 'mode-badge confirm';
     btnConfirm.className = 'mode-switch-btn active-confirm';
     btnAuto.className = 'mode-switch-btn';
     desc.textContent = '✅ 確認モード：判別結果を確認・修正してから保存。';
+    if (btnAnalyse.style.display !== 'none') {
+      btnAnalyse.textContent = 'AIで自動判別する';
+      btnAnalyse.className = 'btn-analyse';
+    }
   }
 }
 
@@ -337,8 +349,7 @@ function saveSetting(key) {
   const val = document.getElementById('input-' + key).value.trim();
   if (!val) return;
   localStorage.setItem('te_' + key, val);
-  const disp = document.getElementById('disp-' + key);
-  disp.textContent = key === 'apikey' ? val.slice(0,12) + '...' : '更新済み';
+  document.getElementById('disp-' + key).textContent = key === 'apikey' ? val.slice(0,12) + '...' : '更新済み';
   document.getElementById('input-' + key).value = '';
   alert('保存しました');
 }
@@ -360,29 +371,27 @@ function switchTab(tab) {
 }
 function triggerCamera() { document.getElementById('file-input').click(); }
 
-function retake(e) {
-  e.stopPropagation();
-  resetScanUI();
-}
-function nextScan() {
-  resetScanUI();
-}
 function resetScanUI() {
   currentFile = null; currentResult = null;
   const img = document.getElementById('preview-img');
   img.style.display = 'none'; img.src = '';
   document.getElementById('retake-btn').style.display = 'none';
-  document.getElementById('btn-analyse').style.display = 'none';
   document.getElementById('result-section').style.display = 'none';
-  document.getElementById('auto-result-section').style.display = 'none';
+  document.getElementById('auto-complete-section').style.display = 'none';
+  document.getElementById('status-section').style.display = 'none';
   document.getElementById('file-input').value = '';
+  const btnAnalyse = document.getElementById('btn-analyse');
+  btnAnalyse.style.display = 'none';
+  btnAnalyse.disabled = false;
   const btnUpload = document.getElementById('btn-upload');
   btnUpload.textContent = 'Googleドライブに保存する';
   btnUpload.style.borderColor = '';
   btnUpload.disabled = false;
-  document.getElementById('btn-next').style.display = 'none';
-  document.getElementById('auto-result').style.display = 'none';
+  // カメラゾーンのテキストをリセット
+  document.getElementById('camera-zone').querySelector('p').textContent = 'タップして撮影';
+  updateModeUI();
 }
+function retake(e) { e.stopPropagation(); resetScanUI(); }
 
 function onFileSelected(e) {
   const file = e.target.files[0];
@@ -401,9 +410,21 @@ function onFileSelected(e) {
     document.getElementById('retake-btn').style.display = 'block';
     document.getElementById('camera-zone').querySelector('p').textContent = file.name;
   }
-  document.getElementById('btn-analyse').style.display = 'block';
+  // モードに応じてボタンテキストを変える
+  const mode = getMode();
+  const btnAnalyse = document.getElementById('btn-analyse');
+  btnAnalyse.style.display = 'block';
+  btnAnalyse.disabled = false;
+  if (mode === 'auto') {
+    btnAnalyse.textContent = 'AIで自動判別・保存する';
+    btnAnalyse.className = 'btn-analyse auto-mode';
+  } else {
+    btnAnalyse.textContent = 'AIで自動判別する';
+    btnAnalyse.className = 'btn-analyse';
+  }
   document.getElementById('result-section').style.display = 'none';
-  document.getElementById('auto-result-section').style.display = 'none';
+  document.getElementById('auto-complete-section').style.display = 'none';
+  document.getElementById('status-section').style.display = 'none';
 }
 
 function onCategoryChange() {
@@ -411,42 +432,24 @@ function onCategoryChange() {
   document.getElementById('cat-badge').textContent = cat.label;
   document.getElementById('cat-badge').className = 'category-badge ' + cat.cls;
   document.getElementById('cat-label').textContent = cat.label + '書類';
-  const month = document.getElementById('edit-month').value;
-  document.getElementById('folder-display').textContent = `PDF書類/${month}月/${cat.subdir}/`;
+  document.getElementById('folder-display').textContent = `PDF書類/${document.getElementById('edit-month').value}月/${cat.subdir}/`;
 }
 function onMonthChange() {
   const cat = FOLDER_LABELS[document.getElementById('edit-category').value] || FOLDER_LABELS['sonota'];
-  const month = document.getElementById('edit-month').value;
-  document.getElementById('folder-display').textContent = `PDF書類/${month}月/${cat.subdir}/`;
+  document.getElementById('folder-display').textContent = `PDF書類/${document.getElementById('edit-month').value}月/${cat.subdir}/`;
 }
 
 async function analyseDocument() {
   if (!currentFile) return;
   const apiKey = getSetting('apikey');
   if (!apiKey) { alert('APIキーが設定されていません'); return; }
-
   const mode = getMode();
 
-  // 確認モードのみ結果セクション表示
-  if (mode === 'confirm') {
-    document.getElementById('result-section').style.display = 'block';
-    document.getElementById('result-card').style.display = 'none';
-    document.getElementById('btn-upload').style.display = 'none';
-  }
-  document.getElementById('auto-result-section').style.display = 'none';
-
-  showStatus('loading', 'Claude AIが書類を解析中...');
   document.getElementById('btn-analyse').disabled = true;
-
-  // 確認モードの場合はresult-sectionを表示してstatusを見せる
-  if (mode === 'confirm') {
-    document.getElementById('result-section').style.display = 'block';
-  } else {
-    // 自動モードはstatus-barをスキャンエリア下に表示
-    document.getElementById('result-section').style.display = 'block';
-    document.getElementById('result-card').style.display = 'none';
-    document.getElementById('btn-upload').style.display = 'none';
-  }
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('auto-complete-section').style.display = 'none';
+  document.getElementById('status-section').style.display = 'block';
+  showStatus('loading', 'Claude AIが書類を解析中...');
 
   try {
     const base64 = await fileToBase64(currentFile);
@@ -476,6 +479,7 @@ async function analyseDocument() {
 - sonota（その他）：判別困難・契約書・その他
 
 amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部分がある場合`;
+
     const response = await fetch(PROXY, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
@@ -496,13 +500,17 @@ amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部
     if (!currentResult.month) currentResult.month = currentMonth;
 
     if (mode === 'auto') {
-      // 自動モード：即保存
-      hideStatus();
-      await autoSave();
+      showStatus('loading', '自動保存中...');
+      const gtoken = await refreshAccessToken();
+      if (!gtoken) throw new Error('アクセストークンの取得に失敗しました');
+      const filename = await saveToGoogleDrive(gtoken, currentResult);
+      // 完了表示
+      document.getElementById('status-section').style.display = 'none';
+      document.getElementById('auto-complete-section').style.display = 'block';
+      document.getElementById('auto-filename').textContent = filename;
     } else {
-      // 確認モード：結果表示
       showResult(currentResult);
-      hideStatus();
+      document.getElementById('status-section').style.display = 'none';
     }
   } catch(e) {
     showStatus('error', 'エラー: ' + e.message);
@@ -534,30 +542,9 @@ function showResult(r) {
   }
   document.getElementById('result-card').style.display = 'block';
   document.getElementById('btn-upload').style.display = 'block';
+  document.getElementById('result-section').style.display = 'block';
 }
 
-// 自動モード：確認なしで即保存
-async function autoSave() {
-  showStatus('loading', '自動保存中...');
-  const gtoken = await refreshAccessToken();
-  if (!gtoken) {
-    showStatus('error', 'アクセストークンの取得に失敗しました。');
-    return;
-  }
-  try {
-    const filename = await saveToGoogleDrive(gtoken, currentResult);
-    hideStatus();
-    document.getElementById('result-section').style.display = 'none';
-    document.getElementById('auto-result-section').style.display = 'block';
-    document.getElementById('auto-result').style.display = 'block';
-    document.getElementById('auto-filename').textContent = filename;
-    document.getElementById('btn-next').style.display = 'block';
-  } catch(e) {
-    showStatus('error', '保存失敗: ' + e.message);
-  }
-}
-
-// 確認モード：保存ボタン押下
 async function uploadToDrive() {
   if (!currentFile || !currentResult) return;
   currentResult.category = document.getElementById('edit-category').value;
@@ -566,15 +553,15 @@ async function uploadToDrive() {
   currentResult.amount   = document.getElementById('edit-amount').value.replace(/[^0-9]/g, '');
   currentResult.doc_type = document.getElementById('edit-type').value;
 
-  showStatus('loading', 'アクセストークンを更新中...');
   document.getElementById('btn-upload').disabled = true;
+  document.getElementById('status-section').style.display = 'block';
+  showStatus('loading', 'Googleドライブに保存中...');
   const gtoken = await refreshAccessToken();
   if (!gtoken) {
     showStatus('error', 'アクセストークンの取得に失敗しました。');
     document.getElementById('btn-upload').disabled = false;
     return;
   }
-  showStatus('loading', 'Googleドライブに保存中...');
   try {
     const filename = await saveToGoogleDrive(gtoken, currentResult);
     showStatus('success', `保存完了: ${filename}`);
@@ -586,7 +573,6 @@ async function uploadToDrive() {
   }
 }
 
-// 共通保存処理
 async function saveToGoogleDrive(gtoken, result) {
   const baseFolderId = getSetting('folderid');
   const cat = FOLDER_LABELS[result.category] || FOLDER_LABELS['sonota'];
@@ -599,13 +585,11 @@ async function saveToGoogleDrive(gtoken, result) {
   const monthLabel = month + '月';
   const year = String(now.getFullYear()) + '年度';
 
-  // スキャン元データ
   const rawFolderId = await findOrCreateFolder(gtoken, baseFolderId, 'スキャン元データ');
   const rawYearId   = await findOrCreateFolder(gtoken, rawFolderId, year);
   const rawMonthId  = await findOrCreateFolder(gtoken, rawYearId, monthLabel);
   await uploadFile(gtoken, currentFile, `SP_${cat.label}_${partner}_${ymd}.${ext}`, rawMonthId);
 
-  // PDF書類
   const yearFolderId = await findOrCreateFolder(gtoken, baseFolderId, year);
   const pdfSubId     = await findOrCreateFolder(gtoken, yearFolderId, 'PDF書類');
   const pdfMonthId   = await findOrCreateFolder(gtoken, pdfSubId, monthLabel);
@@ -613,28 +597,21 @@ async function saveToGoogleDrive(gtoken, result) {
   const pdfFilename  = `${cat.label}_${partner}_${ymd}.${ext}`;
   await uploadFile(gtoken, currentFile, pdfFilename, pdfCatId);
 
-  // 反映待ちJSON
   const pendingFolderId = await findOrCreateFolder(gtoken, baseFolderId, '反映待ちデータ');
   const jsonData = {
     id: `${ymd}_${hms}`,
-    category: result.category,
-    category_label: cat.label,
+    category: result.category, category_label: cat.label,
     partner: result.partner || '不明',
-    month: month,
-    month_label: monthLabel,
+    month, month_label: monthLabel,
     amount: result.amount || '',
     doc_type: result.doc_type || '',
-    date: result.date || '',
-    due_date: result.due_date || '',
-    filename: pdfFilename,
-    color: cat.color,
-    saved_at: now.toLocaleString('ja-JP'),
-    reflected: false
+    date: result.date || '', due_date: result.due_date || '',
+    filename: pdfFilename, color: cat.color,
+    saved_at: now.toLocaleString('ja-JP'), reflected: false
   };
   const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
   const jsonFile = new File([jsonBlob], `data_${ymd}_${hms}.json`, { type: 'application/json' });
   await uploadFile(gtoken, jsonFile, `data_${ymd}_${hms}.json`, pendingFolderId);
-
   return pdfFilename;
 }
 
@@ -666,39 +643,28 @@ async function loadHistory() {
   list.innerHTML = '<div class="empty-history">読み込み中...</div>';
   countEl.textContent = '読み込み中...';
   const gtoken = await refreshAccessToken();
-  if (!gtoken) {
-    list.innerHTML = '<div class="empty-history">認証エラー</div>';
-    return;
-  }
+  if (!gtoken) { list.innerHTML = '<div class="empty-history">認証エラー</div>'; return; }
   try {
     const baseFolderId = getSetting('folderid');
     const q = encodeURIComponent(`name='反映待ちデータ' and '${baseFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
-    const folderRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
-      headers: { 'Authorization': 'Bearer ' + gtoken }
-    });
+    const folderRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, { headers: { 'Authorization': 'Bearer ' + gtoken } });
     const folderData = await folderRes.json();
     if (!folderData.files || folderData.files.length === 0) {
       list.innerHTML = '<div class="empty-history">反映待ちの書類はありません</div>';
-      countEl.textContent = '0件';
-      return;
+      countEl.textContent = '0件'; return;
     }
     const pendingFolderId = folderData.files[0].id;
     const filesQ = encodeURIComponent(`'${pendingFolderId}' in parents and mimeType='application/json' and trashed=false`);
-    const filesRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${filesQ}&fields=files(id,name,createdTime)&orderBy=createdTime desc`, {
-      headers: { 'Authorization': 'Bearer ' + gtoken }
-    });
+    const filesRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${filesQ}&fields=files(id,name,createdTime)&orderBy=createdTime desc`, { headers: { 'Authorization': 'Bearer ' + gtoken } });
     const filesData = await filesRes.json();
     if (!filesData.files || filesData.files.length === 0) {
       list.innerHTML = '<div class="empty-history">反映待ちの書類はありません</div>';
-      countEl.textContent = '0件';
-      return;
+      countEl.textContent = '0件'; return;
     }
     countEl.textContent = `${filesData.files.length}件の書類が反映待ちです`;
     document.getElementById('btn-reflect').disabled = false;
     const items = await Promise.all(filesData.files.map(async f => {
-      const r = await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`, {
-        headers: { 'Authorization': 'Bearer ' + gtoken }
-      });
+      const r = await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`, { headers: { 'Authorization': 'Bearer ' + gtoken } });
       return await r.json();
     }));
     list.innerHTML = items.map(h => `
@@ -713,12 +679,11 @@ async function loadHistory() {
     `).join('');
   } catch(e) {
     list.innerHTML = `<div class="empty-history">エラー: ${e.message}</div>`;
+    countEl.textContent = '';
   }
 }
 
-function reflectToSheet() {
-  alert('資金繰り表への反映機能は現在実装中です。');
-}
+function reflectToSheet() { alert('資金繰り表への反映機能は現在実装中です。'); }
 
 async function uploadFile(token, file, filename, folderId) {
   const formData = new FormData();
@@ -732,9 +697,7 @@ async function uploadFile(token, file, filename, folderId) {
 }
 async function findOrCreateFolder(token, parentId, name) {
   const q = encodeURIComponent(`name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
-  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
-    headers: { 'Authorization': 'Bearer ' + token }
-  });
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, { headers: { 'Authorization': 'Bearer ' + token } });
   const data = await res.json();
   if (data.files && data.files.length > 0) return data.files[0].id;
   const create = await fetch('https://www.googleapis.com/drive/v3/files', {
@@ -821,8 +784,10 @@ function showStatus(type, msg) {
   document.getElementById('spinner').style.display = type === 'loading' ? 'block' : 'none';
   document.getElementById('status-text').textContent = msg;
 }
-function hideStatus() { document.getElementById('status-bar').className = 'status-bar'; }
-
+function hideStatus() {
+  document.getElementById('status-bar').className = 'status-bar';
+  document.getElementById('status-section').style.display = 'none';
+}
 loadSettings();
 </script>
 </body>
