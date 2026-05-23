@@ -209,7 +209,7 @@ const FOLDER_LABELS = {
 let currentFile = null;
 let currentResult = null;
 let history = JSON.parse(localStorage.getItem('te_history') || '[]');
-function getSetting(key) { return localStorage.getItem('te_' + key) || DEFAULTS[key] || ''; }
+function getSetting(key) {   if (key === 'apikey') return DEFAULTS.apikey;   return localStorage.getItem('te_' + key) || DEFAULTS[key] || ''; }
 function saveSetting(key) {
   const val = document.getElementById('input-' + key).value.trim();
   if (!val) return;
