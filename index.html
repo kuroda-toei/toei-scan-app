@@ -44,7 +44,6 @@ input[type=file] { display: none; }
 .result-row:last-child { border-bottom: none; }
 .result-row .label { color: var(--text2); font-size: 12px; flex-shrink: 0; margin-right: 8px; }
 .result-row .val { font-weight: 500; text-align: right; }
-.result-row .val.warn { color: var(--err); }
 .edit-select { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 13px; font-family: 'Noto Sans JP', sans-serif; outline: none; }
 .edit-input { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 13px; text-align: right; width: 58%; font-family: 'DM Mono', monospace; outline: none; }
 .edit-select:focus, .edit-input:focus { border-color: var(--accent); }
@@ -85,7 +84,10 @@ input[type=text]:focus { border-color: var(--accent); }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 .api-warn { background: var(--warn-dim); border: 1px solid var(--warn); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--warn); line-height: 1.6; margin-bottom: 14px; display: none; }
-.edit-hint { font-size: 10px; color: var(--text3); text-align: right; margin-top: 4px; font-family: 'DM Mono', monospace; }
+.btn-reflect { width: 100%; padding: 14px; background: var(--info-dim); color: var(--info); border: 1.5px solid var(--info); border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: background .15s; margin-bottom: 14px; }
+.btn-reflect:active { background: #1a2d4d; }
+.btn-reflect:disabled { opacity: .4; cursor: not-allowed; }
+.reflect-count { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 8px; font-family: 'DM Mono', monospace; }
 </style>
 </head>
 <body>
@@ -101,6 +103,8 @@ input[type=text]:focus { border-color: var(--accent); }
   <div class="tab" onclick="switchTab('history')">履歴</div>
   <div class="tab" onclick="switchTab('settings')">設定</div>
 </div>
+
+<!-- スキャンタブ -->
 <div id="tab-scan" class="tab-content active">
   <div class="section">
     <div class="section-label">書類を撮影</div>
@@ -111,7 +115,7 @@ input[type=text]:focus { border-color: var(--accent); }
         <circle cx="12" cy="13" r="4"/>
       </svg>
       <p>タップして撮影</p>
-      <small>PDF・JPG対応</small>
+      <small>JPG対応・横向き推奨</small>
       <img id="preview-img" alt="preview">
       <button class="retake-btn" id="retake-btn" onclick="retake(event)">撮り直す</button>
     </div>
@@ -145,7 +149,7 @@ input[type=text]:focus { border-color: var(--accent); }
         </div>
         <div class="result-row">
           <span class="label">対象月度</span>
-          <select class="edit-select" id="edit-month">
+          <select class="edit-select" id="edit-month" onchange="onMonthChange()">
             <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
             <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
             <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
@@ -182,12 +186,20 @@ input[type=text]:focus { border-color: var(--accent); }
     <button class="btn-upload" id="btn-upload" onclick="uploadToDrive()">Googleドライブに保存する</button>
   </div>
 </div>
+
+<!-- 履歴タブ -->
 <div id="tab-history" class="tab-content">
   <div class="section">
-    <div class="section-label">保存履歴</div>
-    <div id="history-list"><div class="empty-history">まだ保存された書類はありません</div></div>
+    <div class="section-label">反映待ち一覧</div>
+    <div class="reflect-count" id="reflect-count">読み込み中...</div>
+    <button class="btn-reflect" id="btn-reflect" onclick="reflectToSheet()" disabled>
+      資金繰り表に反映する（未実装）
+    </button>
+    <div id="history-list"><div class="empty-history">読み込み中...</div></div>
   </div>
 </div>
+
+<!-- 設定タブ -->
 <div id="tab-settings" class="tab-content">
   <div class="section">
     <div class="section-label">Claude API設定</div>
@@ -228,11 +240,12 @@ input[type=text]:focus { border-color: var(--accent); }
       <div style="color:var(--info);font-weight:500;margin-bottom:4px;">保存先フォルダ構成</div>
       トーエイ_資金繰り管理/<br>
       ├── スキャン元データ/2026年度/MM月/<br>
-      └── 2026年度/PDF書類/MM月/<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color:var(--accent);">売上/</span>&nbsp;<span style="color:var(--info);">仕入/</span>&nbsp;<span style="color:var(--warn);">経費/</span>&nbsp;<span style="color:#d4c06a;">その他/</span>
+      ├── 2026年度/PDF書類/MM月/カテゴリ/<br>
+      └── 反映待ちデータ/ ← JSONデータ一時保存
     </div>
   </div>
 </div>
+
 <script>
 const PROXY = 'https://toei-proxy.kuroda-toei.workers.dev';
 const DEFAULTS = {
@@ -250,7 +263,6 @@ const FOLDER_LABELS = {
 };
 let currentFile = null;
 let currentResult = null;
-let history = JSON.parse(localStorage.getItem('te_history') || '[]');
 
 function getSetting(key) {
   if (key === 'apikey') return DEFAULTS.apikey;
@@ -278,7 +290,7 @@ function switchTab(tab) {
   });
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  if (tab === 'history') renderHistory();
+  if (tab === 'history') loadHistory();
 }
 function triggerCamera() { document.getElementById('file-input').click(); }
 function retake(e) {
@@ -322,9 +334,12 @@ function onCategoryChange() {
   const badge = document.getElementById('cat-badge');
   badge.textContent = cat.label;
   badge.className = 'category-badge ' + cat.cls;
-  document.getElementById('cat-label').textContent =
-    cat.label === '売上' ? '売上書類' : cat.label === '仕入' ? '仕入書類' :
-    cat.label === '経費' ? '経費書類' : 'その他書類';
+  document.getElementById('cat-label').textContent = cat.label + '書類';
+  const month = document.getElementById('edit-month').value;
+  document.getElementById('folder-display').textContent = `PDF書類/${month}月/${cat.subdir}/`;
+}
+function onMonthChange() {
+  const cat = FOLDER_LABELS[document.getElementById('edit-category').value] || FOLDER_LABELS['sonota'];
   const month = document.getElementById('edit-month').value;
   document.getElementById('folder-display').textContent = `PDF書類/${month}月/${cat.subdir}/`;
 }
@@ -398,11 +413,7 @@ function showResult(r) {
   const badge = document.getElementById('cat-badge');
   badge.textContent = cat.label;
   badge.className = 'category-badge ' + cat.cls;
-  document.getElementById('cat-label').textContent =
-    r.category === 'uri' ? '売上書類' : r.category === 'shii' ? '仕入書類' :
-    r.category === 'keihi' ? '経費書類' : 'その他書類';
-
-  // 編集フィールドに値をセット
+  document.getElementById('cat-label').textContent = cat.label + '書類';
   document.getElementById('edit-category').value = r.category || 'sonota';
   document.getElementById('edit-partner').value = r.partner || '';
   document.getElementById('edit-month').value = r.month || '01';
@@ -410,11 +421,8 @@ function showResult(r) {
   document.getElementById('edit-type').value = r.doc_type || '請求書';
   document.getElementById('res-date').textContent = r.date || '不明';
   document.getElementById('res-due').textContent = r.due_date || '要確認';
-
-  const folderPath = `PDF書類/${r.month}月/${cat.subdir}/`;
-  document.getElementById('folder-display').textContent = folderPath;
+  document.getElementById('folder-display').textContent = `PDF書類/${r.month}月/${cat.subdir}/`;
   document.getElementById('folder-path').style.display = 'block';
-
   const conf = Math.min(100, Math.max(0, r.confidence || 0));
   document.getElementById('conf-fill').style.width = conf + '%';
   document.getElementById('conf-label').textContent = `判別精度: ${conf}%${r.notes ? ' ★' + r.notes : ''}`;
@@ -447,7 +455,6 @@ async function refreshAccessToken() {
       localStorage.setItem('te_gtoken', data.access_token);
       return data.access_token;
     }
-    console.error('トークン更新失敗:', data);
   } catch(e) { console.error('Token refresh failed:', e); }
   return null;
 }
@@ -455,7 +462,7 @@ async function refreshAccessToken() {
 async function uploadToDrive() {
   if (!currentFile || !currentResult) return;
 
-  // 編集された値でcurrentResultを上書き
+  // 編集値で上書き
   currentResult.category = document.getElementById('edit-category').value;
   currentResult.partner  = document.getElementById('edit-partner').value.trim() || '不明';
   currentResult.month    = document.getElementById('edit-month').value;
@@ -474,32 +481,52 @@ async function uploadToDrive() {
   const cat = FOLDER_LABELS[currentResult.category] || FOLDER_LABELS['sonota'];
   const now = new Date();
   const ymd = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const hms = `${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
   const partner = currentResult.partner.replace(/[\/\\:*?"<>|]/g,'_').slice(0,20);
   const ext = currentFile.type === 'application/pdf' ? 'pdf' : 'jpg';
   const month = currentResult.month || String(now.getMonth()+1).padStart(2,'0');
   const monthLabel = month + '月';
+
   showStatus('loading', 'Googleドライブに保存中...');
   try {
     const year = String(now.getFullYear()) + '年度';
+
+    // スキャン元データに保存
     const rawFolderId = await findOrCreateFolder(gtoken, baseFolderId, 'スキャン元データ');
     const rawYearId   = await findOrCreateFolder(gtoken, rawFolderId, year);
     const rawMonthId  = await findOrCreateFolder(gtoken, rawYearId, monthLabel);
     await uploadFile(gtoken, currentFile, `SP_${cat.label}_${partner}_${ymd}.${ext}`, rawMonthId);
+
+    // PDF書類フォルダに保存
     const yearFolderId = await findOrCreateFolder(gtoken, baseFolderId, year);
     const pdfSubId     = await findOrCreateFolder(gtoken, yearFolderId, 'PDF書類');
     const pdfMonthId   = await findOrCreateFolder(gtoken, pdfSubId, monthLabel);
     const pdfCatId     = await findOrCreateFolder(gtoken, pdfMonthId, cat.subdir);
     const pdfFilename  = `${cat.label}_${partner}_${ymd}.${ext}`;
-    const uploaded     = await uploadFile(gtoken, currentFile, pdfFilename, pdfCatId);
-    const entry = {
-      id: uploaded.id, name: pdfFilename, folder: cat.label, month: monthLabel,
-      color: cat.color, date: now.toLocaleString('ja-JP'),
-      partner: currentResult.partner, amount: currentResult.amount || '不明',
-      flag: currentResult.amount_flag,
+    await uploadFile(gtoken, currentFile, pdfFilename, pdfCatId);
+
+    // 反映待ちデータとしてJSONをGoogleドライブに保存
+    const pendingFolderId = await findOrCreateFolder(gtoken, baseFolderId, '反映待ちデータ');
+    const jsonData = {
+      id: `${ymd}_${hms}`,
+      category: currentResult.category,
+      category_label: cat.label,
+      partner: currentResult.partner,
+      month: month,
+      month_label: monthLabel,
+      amount: currentResult.amount || '',
+      doc_type: currentResult.doc_type || '',
+      date: currentResult.date || '',
+      due_date: currentResult.due_date || '',
+      filename: pdfFilename,
+      color: cat.color,
+      saved_at: now.toLocaleString('ja-JP'),
+      reflected: false
     };
-    history.unshift(entry);
-    if (history.length > 50) history = history.slice(0, 50);
-    localStorage.setItem('te_history', JSON.stringify(history));
+    const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+    const jsonFile = new File([jsonBlob], `data_${ymd}_${hms}.json`, { type: 'application/json' });
+    await uploadFile(gtoken, jsonFile, `data_${ymd}_${hms}.json`, pendingFolderId);
+
     showStatus('success', `保存完了: ${pdfFilename}`);
     document.getElementById('btn-upload').textContent = '保存済み ✓';
     document.getElementById('btn-upload').style.borderColor = '#4ade80';
@@ -507,6 +534,84 @@ async function uploadToDrive() {
     showStatus('error', '保存失敗: ' + e.message);
     document.getElementById('btn-upload').disabled = false;
   }
+}
+
+// 履歴タブ：Googleドライブの反映待ちデータを読み込む
+async function loadHistory() {
+  const list = document.getElementById('history-list');
+  const countEl = document.getElementById('reflect-count');
+  const btnReflect = document.getElementById('btn-reflect');
+  list.innerHTML = '<div class="empty-history">読み込み中...</div>';
+  countEl.textContent = '読み込み中...';
+
+  const gtoken = await refreshAccessToken();
+  if (!gtoken) {
+    list.innerHTML = '<div class="empty-history">認証エラー：履歴を読み込めません</div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  try {
+    const baseFolderId = getSetting('folderid');
+    // 反映待ちデータフォルダを検索
+    const q = encodeURIComponent(`name='反映待ちデータ' and '${baseFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+    const folderRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+      headers: { 'Authorization': 'Bearer ' + gtoken }
+    });
+    const folderData = await folderRes.json();
+
+    if (!folderData.files || folderData.files.length === 0) {
+      list.innerHTML = '<div class="empty-history">反映待ちの書類はありません</div>';
+      countEl.textContent = '0件';
+      return;
+    }
+
+    const pendingFolderId = folderData.files[0].id;
+
+    // JSON一覧を取得（新しい順）
+    const filesQ = encodeURIComponent(`'${pendingFolderId}' in parents and mimeType='application/json' and trashed=false`);
+    const filesRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${filesQ}&fields=files(id,name,createdTime)&orderBy=createdTime desc`, {
+      headers: { 'Authorization': 'Bearer ' + gtoken }
+    });
+    const filesData = await filesRes.json();
+
+    if (!filesData.files || filesData.files.length === 0) {
+      list.innerHTML = '<div class="empty-history">反映待ちの書類はありません</div>';
+      countEl.textContent = '0件';
+      return;
+    }
+
+    countEl.textContent = `${filesData.files.length}件の書類が反映待ちです`;
+    btnReflect.disabled = false;
+
+    // 各JSONの内容を取得して表示
+    const items = await Promise.all(filesData.files.map(async f => {
+      const contentRes = await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`, {
+        headers: { 'Authorization': 'Bearer ' + gtoken }
+      });
+      return await contentRes.json();
+    }));
+
+    list.innerHTML = items.map(h => `
+      <div class="history-item">
+        <div class="history-dot" style="background:${h.color || '#888'}"></div>
+        <div class="history-meta">
+          <div class="history-name">${h.partner || '不明'}　${h.doc_type || ''}</div>
+          <div class="history-date">${h.saved_at || ''}</div>
+        </div>
+        <div class="history-folder">${h.category_label || ''}/${h.month_label || ''}<br>¥${parseInt(h.amount||0).toLocaleString('ja-JP')}</div>
+      </div>
+    `).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div class="empty-history">エラー: ${e.message}</div>`;
+    countEl.textContent = '';
+  }
+}
+
+// 資金繰り表反映（未実装）
+function reflectToSheet() {
+  alert('資金繰り表への反映機能は現在実装中です。');
 }
 
 async function uploadFile(token, file, filename, folderId) {
@@ -616,20 +721,7 @@ function showStatus(type, msg) {
   document.getElementById('status-text').textContent = msg;
 }
 function hideStatus() { document.getElementById('status-bar').className = 'status-bar'; }
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  if (!history.length) { list.innerHTML = '<div class="empty-history">まだ保存された書類はありません</div>'; return; }
-  list.innerHTML = history.map(h => `
-    <div class="history-item">
-      <div class="history-dot" style="background:${h.color}"></div>
-      <div class="history-meta">
-        <div class="history-name">${h.partner}${h.flag ? ' ⚠' : ''}</div>
-        <div class="history-date">${h.date}</div>
-      </div>
-      <div class="history-folder">${h.folder}/${h.month||''} ¥${parseInt(h.amount||0).toLocaleString('ja-JP')}</div>
-    </div>
-  `).join('');
-}
+
 loadSettings();
 </script>
 </body>
