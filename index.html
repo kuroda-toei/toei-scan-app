@@ -469,7 +469,6 @@ function fileToBase64(file) {
     reader.onload = ev => {
       const img = new Image();
       img.onload = () => {
-        // Exif情報から回転角度を取得して正しい向きに補正
         getExifOrientation(file).then(orientation => {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
@@ -486,7 +485,18 @@ function fileToBase64(file) {
             case 8: ctx.transform(0,-1,1,0,0,w); break;
           }
           ctx.drawImage(img, 0, 0);
-          r// 最大幅1600pxにリサイズして圧縮 const maxSize = 1600; let sw = canvas.width, sh = canvas.height; if (sw > maxSize || sh > maxSize) {   const ratio = Math.min(maxSize/sw, maxSize/sh);   const resized = document.createElement('canvas');   resized.width = Math.round(sw * ratio);   resized.height = Math.round(sh * ratio);   resized.getContext('2d').drawImage(canvas, 0, 0, resized.width, resized.height);   resolve(resized.toDataURL('image/jpeg', 0.85).split(',')[1]); } else {   resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]); }
+          const maxSize = 1600;
+          let sw = canvas.width, sh = canvas.height;
+          if (sw > maxSize || sh > maxSize) {
+            const ratio = Math.min(maxSize/sw, maxSize/sh);
+            const resized = document.createElement('canvas');
+            resized.width = Math.round(sw * ratio);
+            resized.height = Math.round(sh * ratio);
+            resized.getContext('2d').drawImage(canvas, 0, 0, resized.width, resized.height);
+            resolve(resized.toDataURL('image/jpeg', 0.85).split(',')[1]);
+          } else {
+            resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+          }
         });
       };
       img.onerror = reject;
@@ -496,7 +506,6 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
-
 function getExifOrientation(file) {
   return new Promise(resolve => {
     const reader = new FileReader();
