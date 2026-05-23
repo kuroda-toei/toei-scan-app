@@ -582,8 +582,7 @@ async function saveToGoogleDrive(gtoken, result) {
   await uploadFile(gtoken, currentFile, `SP_${cat.label}_${partner}_${ymd}.${ext}`, rawMonthId);
 
   const yearFolderId = await findOrCreateFolder(gtoken, baseFolderId, year);
-  const pdfSubId     = await findOrCreateFolder(gtoken, yearFolderId, 'PDF書類');
-  const pdfMonthId   = await findOrCreateFolder(gtoken, pdfSubId, monthLabel);
+  const pdfMonthId   = await findOrCreateFolder(gtoken, yearFolderId, monthLabel);
   const pdfCatId     = await findOrCreateFolder(gtoken, pdfMonthId, cat.subdir);
   const pdfFilename  = `${cat.label}_${partner}_${ymd}.${ext}`;
   await uploadFile(gtoken, currentFile, pdfFilename, pdfCatId);
