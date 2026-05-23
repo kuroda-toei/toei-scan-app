@@ -379,7 +379,12 @@ function resetScanUI() {
   document.getElementById('result-section').style.display = 'none';
   document.getElementById('auto-complete-section').style.display = 'none';
   document.getElementById('status-section').style.display = 'none';
-  document.getElementById('file-input').value = '';
+
+  // 自動モードの場合はファイル選択後すぐに判別・保存開始
+  if (getMode() === 'auto') {
+    setTimeout(() => analyseDocument(), 300);
+  }
+}
   const btnAnalyse = document.getElementById('btn-analyse');
   btnAnalyse.style.display = 'none';
   btnAnalyse.disabled = false;
