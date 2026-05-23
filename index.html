@@ -93,7 +93,6 @@ input[type=text]:focus { border-color: var(--accent); }
 .btn-reflect { width: 100%; padding: 14px; background: var(--info-dim); color: var(--info); border: 1.5px solid var(--info); border-radius: var(--radius); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: background .15s; margin-bottom: 14px; }
 .btn-reflect:disabled { opacity: .4; cursor: not-allowed; }
 .reflect-count { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 8px; font-family: 'DM Mono', monospace; }
-/* 自動保存完了 */
 .auto-complete { background: var(--accent-dim); border: 1px solid var(--accent); border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-top: 14px; }
 .auto-complete .check { font-size: 40px; margin-bottom: 10px; }
 .auto-complete .title { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
@@ -118,7 +117,6 @@ input[type=text]:focus { border-color: var(--accent); }
   <div class="tab" onclick="switchTab('settings')">設定</div>
 </div>
 
-<!-- スキャンタブ -->
 <div id="tab-scan" class="tab-content active">
   <div class="section">
     <div class="section-label">書類を撮影</div>
@@ -136,7 +134,6 @@ input[type=text]:focus { border-color: var(--accent); }
     <button class="btn-analyse" id="btn-analyse" onclick="analyseDocument()">AIで自動判別する</button>
   </div>
 
-  <!-- ステータスバー（スキャンエリア直下・全モード共通） -->
   <div class="section" id="status-section" style="display:none;padding-top:0;">
     <div class="status-bar" id="status-bar" style="margin-top:0;">
       <div class="spinner" id="spinner"></div>
@@ -144,7 +141,6 @@ input[type=text]:focus { border-color: var(--accent); }
     </div>
   </div>
 
-  <!-- 確認モード：判別結果＋編集 -->
   <div class="section" id="result-section" style="display:none;">
     <div class="section-label">判別結果 <span style="color:var(--text3);font-size:9px;">※各項目を修正できます</span></div>
     <div class="result-card" id="result-card">
@@ -205,7 +201,6 @@ input[type=text]:focus { border-color: var(--accent); }
     <button class="btn-upload" id="btn-upload" onclick="uploadToDrive()">Googleドライブに保存する</button>
   </div>
 
-  <!-- 自動モード：保存完了表示 -->
   <div class="section" id="auto-complete-section" style="display:none;">
     <div class="auto-complete">
       <div class="check">✅</div>
@@ -216,7 +211,6 @@ input[type=text]:focus { border-color: var(--accent); }
   </div>
 </div>
 
-<!-- 履歴タブ -->
 <div id="tab-history" class="tab-content">
   <div class="section">
     <div class="section-label">反映待ち一覧</div>
@@ -226,7 +220,6 @@ input[type=text]:focus { border-color: var(--accent); }
   </div>
 </div>
 
-<!-- 設定タブ -->
 <div id="tab-settings" class="tab-content">
   <div class="section">
     <div class="section-label">保存モード</div>
@@ -305,12 +298,9 @@ const FOLDER_LABELS = {
 let currentFile = null;
 let currentResult = null;
 
-// ===== モード管理 =====
 function getMode() { return localStorage.getItem('te_mode') || 'confirm'; }
-function setMode(mode) {
-  localStorage.setItem('te_mode', mode);
-  updateModeUI();
-}
+function setMode(mode) { localStorage.setItem('te_mode', mode); updateModeUI(); }
+
 function updateModeUI() {
   const mode = getMode();
   const badge = document.getElementById('header-mode-badge');
@@ -319,18 +309,16 @@ function updateModeUI() {
   const desc = document.getElementById('mode-desc');
   const btnAnalyse = document.getElementById('btn-analyse');
   if (mode === 'auto') {
-    badge.textContent = '自動モード';
-    badge.className = 'mode-badge auto';
+    badge.textContent = '自動モード'; badge.className = 'mode-badge auto';
     btnConfirm.className = 'mode-switch-btn';
     btnAuto.className = 'mode-switch-btn active-auto';
-    desc.textContent = '⚡ 自動モード：判別後すぐ自動保存。連続撮影に最適。';
+    desc.textContent = '⚡ 自動モード：撮影後すぐ自動判別・保存。連続撮影に最適。';
     if (btnAnalyse.style.display !== 'none') {
       btnAnalyse.textContent = 'AIで自動判別・保存する';
       btnAnalyse.className = 'btn-analyse auto-mode';
     }
   } else {
-    badge.textContent = '確認モード';
-    badge.className = 'mode-badge confirm';
+    badge.textContent = '確認モード'; badge.className = 'mode-badge confirm';
     btnConfirm.className = 'mode-switch-btn active-confirm';
     btnAuto.className = 'mode-switch-btn';
     desc.textContent = '✅ 確認モード：判別結果を確認・修正してから保存。';
@@ -379,12 +367,7 @@ function resetScanUI() {
   document.getElementById('result-section').style.display = 'none';
   document.getElementById('auto-complete-section').style.display = 'none';
   document.getElementById('status-section').style.display = 'none';
-
-  // 自動モードの場合はファイル選択後すぐに判別・保存開始
-  if (getMode() === 'auto') {
-    setTimeout(() => analyseDocument(), 300);
-  }
-}
+  document.getElementById('file-input').value = '';
   const btnAnalyse = document.getElementById('btn-analyse');
   btnAnalyse.style.display = 'none';
   btnAnalyse.disabled = false;
@@ -392,10 +375,10 @@ function resetScanUI() {
   btnUpload.textContent = 'Googleドライブに保存する';
   btnUpload.style.borderColor = '';
   btnUpload.disabled = false;
-  // カメラゾーンのテキストをリセット
   document.getElementById('camera-zone').querySelector('p').textContent = 'タップして撮影';
   updateModeUI();
 }
+
 function retake(e) { e.stopPropagation(); resetScanUI(); }
 
 function onFileSelected(e) {
@@ -415,7 +398,6 @@ function onFileSelected(e) {
     document.getElementById('retake-btn').style.display = 'block';
     document.getElementById('camera-zone').querySelector('p').textContent = file.name;
   }
-  // モードに応じてボタンテキストを変える
   const mode = getMode();
   const btnAnalyse = document.getElementById('btn-analyse');
   btnAnalyse.style.display = 'block';
@@ -430,6 +412,11 @@ function onFileSelected(e) {
   document.getElementById('result-section').style.display = 'none';
   document.getElementById('auto-complete-section').style.display = 'none';
   document.getElementById('status-section').style.display = 'none';
+
+  // 自動モードの場合はファイル選択後すぐに判別・保存開始
+  if (mode === 'auto') {
+    setTimeout(() => analyseDocument(), 300);
+  }
 }
 
 function onCategoryChange() {
@@ -509,7 +496,6 @@ amount_flagはtrue = 金額が50万円以上かつ読み取りに不明瞭な部
       const gtoken = await refreshAccessToken();
       if (!gtoken) throw new Error('アクセストークンの取得に失敗しました');
       const filename = await saveToGoogleDrive(gtoken, currentResult);
-      // 完了表示
       document.getElementById('status-section').style.display = 'none';
       document.getElementById('auto-complete-section').style.display = 'block';
       document.getElementById('auto-filename').textContent = filename;
@@ -604,12 +590,9 @@ async function saveToGoogleDrive(gtoken, result) {
 
   const pendingFolderId = await findOrCreateFolder(gtoken, baseFolderId, '反映待ちデータ');
   const jsonData = {
-    id: `${ymd}_${hms}`,
-    category: result.category, category_label: cat.label,
-    partner: result.partner || '不明',
-    month, month_label: monthLabel,
-    amount: result.amount || '',
-    doc_type: result.doc_type || '',
+    id: `${ymd}_${hms}`, category: result.category, category_label: cat.label,
+    partner: result.partner || '不明', month, month_label: monthLabel,
+    amount: result.amount || '', doc_type: result.doc_type || '',
     date: result.date || '', due_date: result.due_date || '',
     filename: pdfFilename, color: cat.color,
     saved_at: now.toLocaleString('ja-JP'), reflected: false
